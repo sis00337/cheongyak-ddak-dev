@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#ffffff">
+<title>청약딱 — 내 조건 맞춤 청약 필터</title>
+<meta name="description" content="무주택·1주택 여부, 거주지, 청약통장 예치금만 넣으면 전국 청약홈 공고 중 지금 신청 가능한 것만 골라 드립니다. 안 되는 이유와 당첨자 발표일 중복까지 한 번에.">
+<meta name="application-name" content="청약딱">
+<meta name="apple-mobile-web-app-title" content="청약딱">
+<meta name="author" content="청약딱">
+<link rel="canonical" href="https://sis00337.github.io/cheongyak-ddak/">
+
+<!-- 아이콘 -->
+<link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="icon" href="favicon-32x32.png" sizes="32x32" type="image/png">
+<link rel="icon" href="favicon-16x16.png" sizes="16x16" type="image/png">
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+<link rel="manifest" href="manifest.webmanifest">
+
+<!-- 공유 미리보기 (카카오톡·메시지·SNS) -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="청약딱">
+<meta property="og:locale" content="ko_KR">
+<meta property="og:title" content="청약딱 — 내 조건에 맞는 청약만 딱 골라드려요">
+<meta property="og:description" content="주택 수·거주지·청약통장 예치금만 넣으면 전국 청약홈 공고 중 지금 신청 가능한 것만, 안 되는 이유와 당첨자 발표일 중복까지 한 번에 보여드려요.">
+<meta property="og:url" content="https://sis00337.github.io/cheongyak-ddak/">
+<meta property="og:image" content="https://sis00337.github.io/cheongyak-ddak/og-image.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="청약딱 — 내 조건에 맞는 청약만 딱 골라드려요">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="청약딱 — 내 조건에 맞는 청약만 딱 골라드려요">
+<meta name="twitter:description" content="주택 수·거주지·예치금만 넣으면 전국 청약홈 공고 중 신청 가능한 것만 골라 드려요.">
+<meta name="twitter:image" content="https://sis00337.github.io/cheongyak-ddak/og-image.png">
+<link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+<header class="topbar">
+  <div class="topbar-inner">
+    <a class="brand" href="./">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 64 64" width="20" height="20" focusable="false"><path d="M32 12.2 L53.6 31.4 V52.6 A3.4 3.4 0 0 1 50.2 56 H13.8 A3.4 3.4 0 0 1 10.4 52.6 V31.4 Z" fill="currentColor"/><path d="M21.2 39.4 L28.2 46.4 L42.6 31.4" fill="none" stroke="#3182F6" stroke-width="7.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </span>
+      <span class="brand-name">청약딱</span>
+      <span class="brand-tag">beta</span>
+    </a>
+    <div class="topbar-meta">
+      <span class="live-dot" aria-hidden="true"></span>
+      <span>전국 공고 <b id="hdrCount">—</b>건<span class="meta-date"> · <span id="hdrDate">2026.11.25</span> 기준</span></span>
+    </div>
+  </div>
+</header>
+
+<div class="mini-bar" id="miniBar" hidden>
+  <div class="mini-bar-inner">
+    <div class="mini-chips" id="miniChips"></div>
+    <button class="mini-edit" id="miniEdit" type="button">조건 수정</button>
+  </div>
+</div>
+
+<main class="page">
+  <p id="syncStatus" class="sync-status sync-status--warning" role="status" aria-live="polite">데이터 갱신 상태를 확인하고 있습니다.</p>
+
+  <section class="hero">
+    <p class="eyebrow"><span class="eyebrow-dot"></span>전국 청약홈 공고를 매일 정리해요</p>
+    <h1>내 조건에 맞는 청약만<br>딱 골라드려요</h1>
+    <p class="hero-sub">
+      무주택·유주택, 사는 지역, 청약통장 예치금까지 반영해서
+      <b>입력 조건에 맞는 공고</b>와 <b>추가 확인할 사항</b>을 같이 보여드려요.
+      서울부터 제주까지, 전국 17개 시도 공고를 한 화면에서.
+    </p>
+    <ul class="hero-points">
+      <li><span class="hp-ico">⚡</span>3초 입력</li>
+      <li><span class="hp-ico">🚫</span>탈락 사유</li>
+      <li><span class="hp-ico">🗓️</span>발표일 중복</li>
+    </ul>
+  </section>
+
+  <div class="layout">
+
+    <!-- ─────────── 조건 입력 ─────────── -->
+    <div class="cond-col">
+      <section class="cond-card" id="condCard" aria-labelledby="condTitle">
+        <div class="cond-head">
+          <div>
+            <h2 id="condTitle">내 조건</h2>
+            <p class="cond-sub">한 번 넣으면 브라우저에 저장돼요</p>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">주택 수 <span class="field-hint">세대 기준</span></div>
+          <div class="seg" id="segHousing" role="group" aria-label="주택 수"></div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">거주지 <span class="field-hint">주민등록지 · 광역권으로 골라도 돼요</span></div>
+          <div class="region-grid" id="segResidence" role="group" aria-label="거주지"></div>
+        </div>
+
+        <div class="field field-deposit">
+          <div class="field-label">청약통장 예치금 <span class="field-hint">통장에 실제로 넣어 둔 금액</span></div>
+          <div class="deposit-value">
+            <strong id="depositValue">2,000,000원</strong>
+            <span class="deposit-hint" id="depositHint">경기 85㎡ 이하 1순위 기준 200만 원</span>
+          </div>
+          <div class="chips chips-deposit" id="depositChips" role="group" aria-label="예치금 빠른 선택 — 50만 원 단위"></div>
+          <input class="range" id="depositRange" type="range" min="0" max="15000000" step="100000" value="2000000" aria-label="청약통장 예치금 — 10만 원 단위">
+          <div class="range-scale"><span>0원</span><span>750만</span><span>1,500만+</span></div>
+          <div class="deposit-input">
+            <label class="di-label" for="depositInput">직접 입력</label>
+            <span class="di-field">
+              <input id="depositInput" type="text" inputmode="numeric" autocomplete="off" value="2,000,000" aria-label="청약통장 예치금 직접 입력 (원)">
+              <span class="di-unit">원</span>
+            </span>
+          </div>
+          <p class="deposit-note">버튼은 50만 원, 슬라이더는 10만 원 단위로 움직여요. 금액은 원 단위로 직접 쓸 수 있어요.</p>
+        </div>
+
+        <div class="field">
+          <div class="field-label">세대주 여부</div>
+          <div class="seg seg-2" id="segHouseholder" role="group" aria-label="세대주 여부"></div>
+        </div>
+
+        <p class="cond-foot">
+          예치금은 <b>공고일까지</b> 채워야 인정돼요. 지금 채우면 이번 접수에는 쓸 수 없습니다.
+        </p>
+      </section>
+
+      <aside class="side-ad" aria-label="광고 영역 예시">
+        <span class="ad-label">광고 · 제휴 슬롯 예시</span>
+        <p class="side-ad-title">예치금이 부족할 때</p>
+        <p class="side-ad-copy">은행별 청약예금·주택담보대출 금리를 한 번에 비교</p>
+        <span class="side-ad-cta">금리 비교하기 →</span>
+        <span class="side-ad-size">300×250 AdSense / 제휴 배너 자리</span>
+      </aside>
+    </div>
+
+    <!-- ─────────── 결과 ─────────── -->
+    <div class="results-col">
+      <div class="ad-leaderboard ad-leaderboard--top" aria-label="광고 영역 예시">
+        <span class="ad-label">광고 · AdSense 슬롯 예시</span>
+        <span class="ad-box">728 × 90 · 반응형 광고가 들어갈 자리</span>
+      </div>
+
+      <div class="results-head">
+        <div class="results-title">
+          <h2><span id="eligibleHead">맞는 공고</span> <b id="eligibleCount">0</b>건</h2>
+          <p id="resultsSub">조건을 확인하는 중…</p>
+        </div>
+        <div class="results-tools">
+          <div class="seg seg-filter" id="segFilter" role="group" aria-label="결과 필터"></div>
+          <label class="sort-wrap">
+            <span class="sr-only">정렬</span>
+            <select id="sortSel">
+              <option value="deadline">마감 임박순</option>
+              <option value="announce">발표일 빠른순</option>
+              <option value="price">분양가 낮은순</option>
+              <option value="units">물량 많은순</option>
+              <option value="region">지역순</option>
+            </select>
+          </label>
+        </div>
+      </div>
+
+      <div id="overlapBanner" class="overlap-wrap" aria-live="polite"></div>
+
+      <div id="cards" class="cards"></div>
+
+      <div class="ad-leaderboard" aria-label="광고 영역 예시">
+        <span class="ad-label">광고 · AdSense 슬롯 예시</span>
+        <span class="ad-box">728 × 90 · 반응형 광고가 들어갈 자리</span>
+      </div>
+
+      <section class="notice">
+        <h3>이 앱이 보는 것</h3>
+        <ul>
+          <li><b>주택 수</b> — 무주택 전용 공고는 1주택이면 아예 신청할 수 없어요. 규제지역(투기과열·청약과열)의 1순위도 무주택만 됩니다.</li>
+          <li><b>거주지</b> — 전국 · 수도권 · 해당지역 요건을 공고문 그대로 판정하고, 해당지역 우선 공고는 남은 물량이라는 점을 따로 알려드려요.</li>
+          <li><b>예치금</b> — 85㎡ 이하 1순위 기준 서울·부산 300만, 그 밖의 광역시 250만, 그 밖의 지역 200만 원이에요.</li>
+          <li><b>발표일 중복</b> — 발표일이 같은 공고는 1인 1건만 유효해요. 관심 체크로 미리 확인하세요.</li>
+          <li><b>청약홈 신청</b> — 상세의 <b>청약홈에서 신청하기</b>는 공고 유형(1순위·무순위·임의공급·오피스텔·민간임대)에 맞는 청약홈 청약신청 화면으로 바로 넘어가요. 신청·전자서명은 청약홈에서 직접 하게 됩니다.</li>
+        </ul>
+        <p class="notice-note" id="dataSourceNote">
+          공고 데이터: 청약홈(applyhome.co.kr) 입주자모집공고 · <b>2026-11-25 수집 · 전국 17개 시도</b> ·
+          APT 분양정보 + APT 잔여세대(무순위·임의공급·불법행위재공급) + 오피스텔·민간임대.
+          자격·거주지·예치금 판정은 첨부된 공고문의 신청자격 문구를 그대로 옮긴 것이며,
+          원문을 확인하지 못한 공고는 카드에 <b>원문 미확인</b>으로 표시합니다.
+        </p>
+      </section>
+
+      <footer class="foot">
+        <span>청약딱</span>
+        <span class="foot-dot">·</span>
+        <span>정보 제공용이며 청약 대행이 아닙니다</span>
+        <span class="foot-dot">·</span>
+        <span>데이터 기준일 <span id="footDate">2026-11-25</span></span>
+      </footer>
+    </div>
+  </div>
+</main>
+
+<!-- 관심 목록 요약 바 -->
+<div class="interest-bar" id="interestBar" hidden>
+  <div class="interest-bar-inner">
+    <div class="ib-left">
+      <span class="ib-count" id="ibCount">0</span>
+      <div class="ib-text">
+        <b>관심 공고</b>
+        <span id="ibSub">발표일이 겹치는지 확인해 드려요</span>
+      </div>
+    </div>
+    <button class="ib-btn" id="ibBtn" type="button">확인하기</button>
+  </div>
+</div>
+
+<!-- 상세 드로어 -->
+<div class="backdrop" id="backdrop" hidden></div>
+<aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" hidden></aside>
+
+<script src="app.js"></script>
+</body>
+</html>
