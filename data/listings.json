@@ -3,7 +3,7 @@
     "source": "한국부동산원 청약홈 분양정보 조회 서비스",
     "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
     "collectedAt": "2026-11-25",
-    "updatedAt": "2026-11-25T23:12:52+09:00",
+    "updatedAt": "2026-11-25T23:15:42+09:00",
     "count": 38,
     "scope": "전국 · APT / 무순위·잔여세대 / 오피스텔·기타 / 공공지원민간임대 / 임의공급",
     "unit": "금액 단위: 만 원",
@@ -878,7 +878,7 @@
       "sourceEndpoint": "getOPTLttotPblancDetail",
       "eligibility": {
         "state": "reviewed",
-        "checkedAt": "2026-11-25T23:12:52+09:00",
+        "checkedAt": "2026-11-25T23:15:42+09:00",
         "reviewedAt": "2026-11-25",
         "validUntil": "2026-12-25",
         "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026940257&pblancNo=2026940257&atchmnflSeqNo=2028027&atchmnflSn=6",
@@ -1109,7 +1109,7 @@
       "sourceEndpoint": "getUrbtyOfctlLttotPblancDetail",
       "eligibility": {
         "state": "reviewed",
-        "checkedAt": "2026-11-25T23:12:52+09:00",
+        "checkedAt": "2026-11-25T23:15:42+09:00",
         "reviewedAt": "2026-11-25",
         "validUntil": "2026-12-25",
         "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950097&pblancNo=2026950097&atchmnflSeqNo=2031017&atchmnflSn=2",
@@ -1772,7 +1772,7 @@
       "sourceEndpoint": "getRemndrLttotPblancDetail",
       "eligibility": {
         "state": "reviewed",
-        "checkedAt": "2026-11-25T23:12:52+09:00",
+        "checkedAt": "2026-11-25T23:15:42+09:00",
         "reviewedAt": "2026-11-25",
         "validUntil": "2026-12-25",
         "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910304&pblancNo=2026910304&atchmnflSeqNo=2027367&atchmnflSn=2",
