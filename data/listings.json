@@ -3,7 +3,7 @@
     "source": "한국부동산원 청약홈 분양정보 조회 서비스",
     "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
     "collectedAt": "2026-11-25",
-    "updatedAt": "2026-11-25T22:32:33+09:00",
+    "updatedAt": "2026-11-25T22:35:49+09:00",
     "count": 38,
     "scope": "전국 · APT / 무순위·잔여세대 / 오피스텔·기타 / 공공지원민간임대 / 임의공급",
     "unit": "금액 단위: 만 원",
