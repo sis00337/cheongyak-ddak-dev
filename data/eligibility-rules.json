@@ -1,0 +1,183 @@
+{
+  "schemaVersion": 1,
+  "reviews": [
+    {
+      "houseManageNo": "2026940257",
+      "pblancNo": "2026940257",
+      "announceDate": "2026-11-19",
+      "reviewedAt": "2026-11-25",
+      "validUntil": "2026-12-25",
+      "source": {
+        "url": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026940257&pblancNo=2026940257&atchmnflSeqNo=2028027&atchmnflSn=6",
+        "sha256": "93c1abb46a021af744d73309eb40989a7b74f81e7965a6c468e4da3043679022"
+      },
+      "checks": {
+        "residence": {
+          "kind": "regions",
+          "values": [
+            "서울",
+            "경기",
+            "인천",
+            "부산",
+            "울산",
+            "경남",
+            "대구",
+            "경북",
+            "대전",
+            "세종",
+            "충북",
+            "충남",
+            "광주",
+            "전북",
+            "전남",
+            "강원",
+            "제주"
+          ],
+          "page": 4,
+          "quote": "입주자모집공고일 현재 국내에 거주하는 만19세 이상인 분"
+        },
+        "deposit": {
+          "kind": "not_required",
+          "page": 4,
+          "quote": "청약통장 가입여부와 무관하게 신청가능"
+        }
+      },
+      "manualChecks": [
+        {
+          "label": "나이·미성년자 예외",
+          "page": 4,
+          "note": "공고일 기준 만 19세 이상 여부 또는 자녀양육·형제자매부양 미성년 세대주 예외를 확인하세요."
+        },
+        {
+          "label": "국내 거주",
+          "page": 4,
+          "note": "선택한 시도 외에 공고일 당시 실제 국내 거주 여부를 확인하세요."
+        },
+        {
+          "label": "주택 수·세대주 요건",
+          "page": 4,
+          "note": "대상자 문구만으로 별도 주택 수·세대주 요건을 확정하지 않았습니다. 원문과 사업주체에서 확인하세요."
+        }
+      ]
+    },
+    {
+      "houseManageNo": "2026950097",
+      "pblancNo": "2026950097",
+      "announceDate": "2026-11-20",
+      "reviewedAt": "2026-11-25",
+      "validUntil": "2026-12-25",
+      "source": {
+        "url": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950097&pblancNo=2026950097&atchmnflSeqNo=2031017&atchmnflSn=2",
+        "sha256": "803466e7827aeec1b7074e92da9fa4b8a5d3659d6a25b3c44a319b5ea7533f8f"
+      },
+      "checks": {
+        "residence": {
+          "kind": "regions",
+          "values": [
+            "서울",
+            "경기",
+            "인천",
+            "부산",
+            "울산",
+            "경남",
+            "대구",
+            "경북",
+            "대전",
+            "세종",
+            "충북",
+            "충남",
+            "광주",
+            "전북",
+            "전남",
+            "강원",
+            "제주"
+          ],
+          "page": 2,
+          "quote": "본 오피스텔은 거주지역 및 청약통장 가입여부와 무관"
+        },
+        "deposit": {
+          "kind": "not_required",
+          "page": 2,
+          "quote": "청약통장이 필요하지 않으며"
+        }
+      },
+      "manualChecks": [
+        {
+          "label": "나이·신청자 유형",
+          "page": 7,
+          "note": "공고일 당시 국내 거주 만 19세 이상 개인 또는 법인 요건을 확인하세요. 앱은 법인 자격을 판정하지 않습니다."
+        },
+        {
+          "label": "공고 내 중복신청",
+          "page": 7,
+          "note": "한 사람이 이 공고에 여러 실을 신청하면 전부 무효가 될 수 있습니다. 1인 1실 제한을 확인하세요."
+        },
+        {
+          "label": "신청금·인증서",
+          "page": 2,
+          "note": "청약통장 예치금과 청약신청금은 별개입니다. 신청금과 사용할 수 있는 인증서를 원문에서 확인하세요."
+        }
+      ]
+    },
+    {
+      "houseManageNo": "2026910304",
+      "pblancNo": "2026910304",
+      "announceDate": "2026-11-23",
+      "reviewedAt": "2026-11-25",
+      "validUntil": "2026-12-25",
+      "source": {
+        "url": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910304&pblancNo=2026910304&atchmnflSeqNo=2027367&atchmnflSn=2",
+        "sha256": "917706351fd0cc368900acf7c6d4c24c7eaf362b5dc4532c462b8b49aeba7de4"
+      },
+      "checks": {
+        "housing": {
+          "kind": "none",
+          "page": 5,
+          "quote": "수도권(경기도·서울특별시·인천광역시)에 거주하는 무주택세대구성원"
+        },
+        "residence": {
+          "kind": "regions",
+          "values": [
+            "서울",
+            "경기",
+            "인천"
+          ],
+          "page": 5,
+          "quote": "수도권(경기도·서울특별시·인천광역시)에 거주하는 무주택세대구성원"
+        },
+        "deposit": {
+          "kind": "not_required",
+          "page": 5,
+          "quote": "청약통장 가입여부와 무관하게 신청가능"
+        },
+        "householder": {
+          "kind": "not_required",
+          "page": 5,
+          "quote": "무주택세대구성원"
+        }
+      },
+      "manualChecks": [
+        {
+          "label": "세대 범위·주택 소유 예외",
+          "page": 2,
+          "note": "배우자 분리세대 등 공고문상 세대 범위와 분양권·입주권 및 주택 소유 예외를 확인하세요."
+        },
+        {
+          "label": "국내 거주·해외 체류",
+          "page": 1,
+          "note": "해외 체류 이력과 공고문에 기재된 예외를 별도로 확인해야 합니다."
+        },
+        {
+          "label": "국적·신청 제한",
+          "page": 5,
+          "note": "외국인 제한, 해당 주택 당첨·계약 이력, 부적격·공급질서교란·재당첨 제한을 확인하세요."
+        },
+        {
+          "label": "나이·중복신청",
+          "page": 2,
+          "note": "공고일 기준 나이와 당첨자 발표일이 겹치는 주택의 중복신청 제한·예외를 확인하세요."
+        }
+      ]
+    }
+  ]
+}

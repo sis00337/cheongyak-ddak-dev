@@ -1,3 +1,65 @@
+/* 공고문에서 검토된 입력 조건만 비교한다. 최종 청약 자격을 확정하지 않는다. */
+(function (root, factory) {
+  if (typeof module === 'object' && module.exports) module.exports = factory();
+  else root.CheongyakEligibility = factory();
+})(typeof globalThis !== 'undefined' ? globalThis : this, function () {
+  'use strict';
+  var regions = ['서울', '경기', '인천', '부산', '울산', '경남', '대구', '경북', '대전', '세종', '충북', '충남', '광주', '전북', '전남', '강원', '제주'];
+  var labels = { housing: '세대 주택 수', residence: '거주 시도', deposit: '청약통장 예치금', householder: '세대주 여부' };
+
+  function evaluate(listing, profile, status, now) {
+    now = now || new Date();
+    var today = new Date(now.getTime() + 9 * 3600000).toISOString().slice(0, 10);
+    var review = listing.eligibility || {};
+    var checked = Date.parse(review.checkedAt || '');
+    var usable = review.state === 'reviewed' && review.validUntil >= today &&
+      isFinite(checked) && now.getTime() - checked <= 30 * 3600000 && checked <= now.getTime() + 60000;
+    var definitions = usable ? review.checks || {} : {};
+    var rows = Object.keys(labels).map(function (key) {
+      var rule = definitions[key];
+      var row = { key: key, label: labels[key], status: 'unknown', text: '공고문에서 이 조건을 확인해야 합니다.' };
+      if (!rule || !rule.quote || !Number.isInteger(rule.page) || rule.page < 1) return row;
+      row.quote = rule.quote;
+      row.page = rule.page;
+      row.sourceUrl = review.sourceUrl;
+      var input = profile[key];
+      var pass;
+      if (rule.kind === 'not_required') {
+        row.status = 'not_applicable'; row.text = '이 공고는 해당 요건을 요구하지 않습니다.'; return row;
+      }
+      if (key === 'housing' && ['none', 'max_one'].indexOf(rule.kind) !== -1) {
+        if (['무주택', '1주택', '2주택+'].indexOf(input) === -1) { row.text = '공고일 기준 세대 주택 수를 입력해 주세요.'; return row; }
+        pass = rule.kind === 'none' ? input === '무주택' : input !== '2주택+';
+        row.text = pass ? '입력한 세대 주택 수가 확인된 조건에 부합합니다.' : (rule.kind === 'none' ? '무주택세대구성원 요건에 맞지 않습니다.' : '확인된 주택 수 요건에 맞지 않습니다.');
+      } else if (key === 'residence' && rule.kind === 'regions' && Array.isArray(rule.values) && rule.values.length && rule.values.every(function (v) { return regions.indexOf(v) !== -1; })) {
+        if (regions.indexOf(input) === -1) { row.text = '공고일 기준 거주 시도를 선택해 주세요.'; return row; }
+        pass = rule.values.indexOf(input) !== -1;
+        row.text = pass ? '입력한 거주 시도가 확인된 지역 조건에 부합합니다.' : rule.values.join('·') + ' 거주 요건에 맞지 않습니다.';
+      } else if (key === 'deposit' && rule.kind === 'minimum' && Number.isSafeInteger(rule.amountWon) && rule.amountWon > 0) {
+        if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; return row; }
+        pass = input >= rule.amountWon;
+        row.text = pass ? '입력한 예치금이 확인된 기준에 부합합니다.' : '예치금 ' + (rule.amountWon - input).toLocaleString('ko-KR') + '원 부족';
+      } else if (key === 'householder' && rule.kind === 'required') {
+        if (['세대주', '세대원'].indexOf(input) === -1) { row.text = '공고일 기준 세대주 여부를 선택해 주세요.'; return row; }
+        pass = input === '세대주'; row.text = pass ? '입력한 세대주 조건이 부합합니다.' : '세대주 요건에 맞지 않습니다.';
+      } else return row;
+      row.status = pass ? 'pass' : 'fail';
+      return row;
+    });
+    var fails = rows.filter(function (r) { return r.status === 'fail'; }).map(function (r) { return { text: r.label + ': ' + r.text }; });
+    var passes = rows.filter(function (r) { return r.status === 'pass' || r.status === 'not_applicable'; }).map(function (r) { return r.label + ': ' + r.text; });
+    var missing = rows.filter(function (r) { return r.status === 'unknown'; });
+    var warnings = missing.map(function (r) { return r.label + ': ' + r.text; });
+    if (!usable) warnings.unshift(review.reason || '현재 공고문과 대조된 자격 근거가 아직 없습니다.');
+    if (usable) (review.manualChecks || []).forEach(function (r) { warnings.push(r.label + ': ' + r.note); });
+    warnings.push('비교 결과는 입력한 조건에 한정됩니다. 최종 자격·예외·신청 제한은 공고문과 청약홈에서 확인하세요.');
+    return { l: listing, status: status, checks: rows, fails: fails, passes: passes, warns: warnings,
+      ok: !fails.length && !missing.length, unknown: !fails.length && !!missing.length,
+      reviewUsable: usable, reviewedCount: Object.keys(definitions).length };
+  }
+  return { evaluate: evaluate, regions: regions };
+});
+
 /* =========================================================
    청약딱 — 내 조건 맞춤 청약 필터 (전국판)
    정적 웹앱 (index.html + styles.css + app.js + data/listings.json)
@@ -5,6 +67,7 @@
    ========================================================= */
 (function () {
   'use strict';
+  if (typeof document === 'undefined') return;
 
   /* ───────────────────────── 상수 ───────────────────────── */
   var HOUSING = [
@@ -12,17 +75,8 @@
     { v: '1주택', l: '1주택' },
     { v: '2주택+', l: '2주택 이상' }
   ];
-  /* 거주지는 광역권 단위로 고른다. 실제 판정은 시도 단위로 한다. */
-  var REGIONS = [
-    { v: '서울', l: '서울', sidos: ['서울'] },
-    { v: '경기', l: '경기', sidos: ['경기'] },
-    { v: '인천', l: '인천', sidos: ['인천'] },
-    { v: '부산·울산·경남', l: '부산·울산·경남', sidos: ['부산', '울산', '경남'] },
-    { v: '대구·경북', l: '대구·경북', sidos: ['대구', '경북'] },
-    { v: '대전·세종·충청', l: '대전·세종·충청', sidos: ['대전', '세종', '충북', '충남'] },
-    { v: '광주·전라', l: '광주·전라', sidos: ['광주', '전북', '전남'] },
-    { v: '강원·제주', l: '강원·제주', sidos: ['강원', '제주'] }
-  ];
+  /* 광역권을 묶으면 서로 다른 시도의 자격을 혼동할 수 있어 정확한 시도로 입력한다. */
+  var REGIONS = window.CheongyakEligibility.regions.map(function (r) { return { v: r, l: r, sidos: [r] }; });
   var HOUSEHOLDER = [
     { v: '세대주', l: '세대주' },
     { v: '세대원', l: '세대원' }
@@ -39,16 +93,16 @@
   ];
   var DEP_MAX = 15000000;   /* 슬라이더 상한 1,500만 원 */
   var DEP_STEP = 100000;    /* 슬라이더 10만 원 단위 */
-  var STORE_KEY = 'cheongyakddak:v3';
-  var LEGACY_KEY = 'cheongyakddak:v2';
+  var STORE_KEY = 'cheongyakddak:v4';
+  var LEGACY_KEY = 'cheongyakddak:v3';
   var WD = ['일', '월', '화', '수', '목', '금', '토'];
 
   /* ───────────────────────── 상태 ───────────────────────── */
   var state = {
-    housing: '무주택',
-    residence: '경기',
-    deposit: 2000000,          /* 원 단위 */
-    householder: '세대주',
+    housing: '',
+    residence: '',
+    deposit: null,          /* 원 단위. 미입력과 0원을 구분한다. */
+    householder: '',
     filter: 'all',
     sort: 'deadline',
     favs: []
@@ -83,7 +137,7 @@
   }
   function parseWon(s) {
     var digits = String(s == null ? '' : s).replace(/[^0-9]/g, '');
-    if (!digits) return 0;
+    if (!digits) return null;
     return Math.min(Number(digits), 999999999);
   }
   function parseDate(iso) {
@@ -92,20 +146,19 @@
     return isNaN(d.getTime()) ? null : d;
   }
   function startOfToday() {
-    var d = new Date();
-    d.setHours(0, 0, 0, 0);
-    return d;
+    var iso = new Date(Date.now() + 9 * 3600000).toISOString().slice(0, 10);
+    return new Date(iso + 'T00:00:00+09:00');
   }
   function diffDays(a, b) { return Math.round((a.getTime() - b.getTime()) / 86400000); }
   function md(iso) {
     var d = parseDate(iso);
     if (!d) return '미정';
-    return (d.getMonth() + 1) + '/' + ('0' + d.getDate()).slice(-2);
+    return Number(iso.slice(5, 7)) + '/' + iso.slice(8, 10);
   }
   function mdw(iso) {
     var d = parseDate(iso);
     if (!d) return '미정';
-    return md(iso) + '(' + WD[d.getDay()] + ')';
+    return md(iso) + '(' + WD[new Date(iso + 'T00:00:00Z').getUTCDay()] + ')';
   }
   function mySidos() {
     for (var i = 0; i < REGIONS.length; i++) {
@@ -156,11 +209,10 @@
       var raw = localStorage.getItem(STORE_KEY);
       if (raw) s = JSON.parse(raw);
       if (!s) {
-        /* 예전 버전(v2)은 예치금을 만원 단위(예: 204)로 저장했다 — 원 단위로 옮겨 온다. */
+        /* 이전 버전의 자동 기본값은 사용자 확인값과 구분할 수 없어 관심 목록만 이관한다. */
         raw = localStorage.getItem(LEGACY_KEY);
         if (raw) {
-          s = JSON.parse(raw);
-          if (typeof s.deposit === 'number') s.depositWon = s.deposit * 10000;
+          s = { favs: JSON.parse(raw).favs };
         }
       }
     } catch (e) { s = null; }
@@ -178,69 +230,7 @@
 
   /* ───────────────────────── 판정 ───────────────────────── */
   function evaluate(L) {
-    var fails = [], passes = [], warns = [];
-    if (!L.verified || L.eligibilityStatus === 'needs_review') {
-      return { l: L, fails: [], passes: [],
-        warns: ['신청 자격은 공고문에서 확인해 주세요. 공고 일정과 자격 검증은 별개입니다.'],
-        status: statusOf(L), ok: false, unknown: true };
-    }
-    var H = state.housing, D = state.deposit, HH = state.householder;
-    var mine = mySidos();
-
-    /* 1. 주택 수 */
-    if (L.housingRequirement === '무주택 전용') {
-      if (H !== '무주택') fails.push({ text: '무주택세대구성원만 신청 가능 (현재 ' + H + ')' });
-      else passes.push('무주택 조건 충족');
-    } else if (L.housingRequirement === '1주택 가능') {
-      if (H === '2주택+') fails.push({ text: '2주택 이상은 1순위 신청 불가' });
-      else if (H === '1주택') passes.push('1주택도 1순위 가능');
-      else passes.push('무주택 — 1순위 가능');
-    } else if (L.housingRequirement === '무관') {
-      passes.push('청약통장·주택 수 무관');
-    } else {
-      fails.push({ text: '공고문 원문에서 자격을 확인하지 못했어요 — 지원 전 공고문 확인 필요' });
-    }
-
-    /* 2. 거주지 */
-    var allowed = L.eligibleRegions || [];
-    var pri = L.priorityRegions || [];
-    if (L.residenceRequirement === '확인 필요' || !allowed.length) {
-      fails.push({ text: '거주지 요건을 원문에서 확인하지 못했어요 — 지원 전 공고문 확인 필요' });
-    } else if (L.residenceRequirement === '전국' || allowed.length >= 17) {
-      passes.push('전국 신청 가능');
-    } else if (!cross(mine, allowed).length) {
-      fails.push({ text: regionLabel(allowed) + ' 거주자만 신청 가능 (현재 ' + state.residence + ')' });
-    } else if (pri.length && !cross(mine, pri).length) {
-      passes.push(regionLabel(allowed) + ' 거주 — 기타지역');
-      warns.push(regionLabel(pri) + ' 해당지역 우선 — 남은 물량만');
-    } else if (pri.length) {
-      passes.push(regionLabel(pri) + ' 거주 — 해당지역');
-    } else {
-      passes.push(regionLabel(allowed) + ' 거주');
-    }
-
-    /* 3. 예치금 */
-    var need = (L.requiredDeposit || 0) * 10000;
-    if (D < need) {
-      fails.push({ text: '예치금 ' + moneyLabel(need - D) + ' 부족 (' + moneyLabel(need) + ' 필요)' });
-    } else if (need > 0) {
-      passes.push('예치금 ' + moneyLabel(need) + ' 충족');
-    } else {
-      passes.push('예치금 요건 없음');
-    }
-
-    /* 4. 세대주 */
-    if (L.householderOnly && HH !== '세대주') {
-      fails.push({ text: '무주택세대의 세대주만 신청 가능' });
-    }
-
-    (L.extraRequirements || []).forEach(function (x) { warns.push(x); });
-
-    var status = statusOf(L);
-    if (status.key === 'closed') warns.push('접수 마감된 공고');
-    if (!L.verified) warns.push('공고문 원문 확인 필요');
-
-    return { l: L, fails: fails, passes: passes, warns: warns, status: status, ok: fails.length === 0 };
+    return window.CheongyakEligibility.evaluate(L, state, statusOf(L));
   }
 
   function evaluateAll() { evalCache = LISTINGS.map(evaluate); return evalCache; }
@@ -265,13 +255,7 @@
   }
 
   function depositHint() {
-    var g = state.residence;
-    if (g === '서울') return '서울 85㎡ 이하 1순위 기준 300만 원';
-    if (g === '부산·울산·경남') return '부산 300만 · 울산 250만 · 경남 200만 원';
-    if (g === '인천' || g === '대구·경북') return '광역시 250만 · 도 지역 200만 원';
-    if (g === '대전·세종·충청') return '대전 250만 · 세종·충북·충남 200만 원';
-    if (g === '광주·전라') return '광주 250만 · 전북·전남 200만 원';
-    return '경기·강원·제주 85㎡ 이하 기준 200만 원';
+    return '공고일 기준 예치금 · 공고 유형과 주택형에 따라 요건이 달라요';
   }
 
   function renderCondition() {
@@ -285,7 +269,7 @@
   /* 예치금 표시 — 버튼(50만)·슬라이더(10만)·직접 입력(원)을 같은 값에서 그린다. */
   function renderDeposit(syncInput) {
     var v = state.deposit;
-    $('#depositValue').textContent = won(v);
+    $('#depositValue').textContent = v == null ? '미입력' : won(v);
     $('#depositHint').textContent = depositHint();
 
     $('#depositChips').innerHTML = DEPOSIT_CHIPS.map(function (c) {
@@ -300,11 +284,11 @@
     range.style.setProperty('--p', (Math.min(v, DEP_MAX) / DEP_MAX * 100) + '%');
 
     var inp = $('#depositInput');
-    if (syncInput && document.activeElement !== inp) inp.value = v ? num(v) : '';
+    if (syncInput && document.activeElement !== inp) inp.value = v == null ? '' : num(v);
   }
 
   function setDeposit(v, opts) {
-    state.deposit = Math.max(0, Math.min(Math.round(v), 999999999));
+    state.deposit = v == null ? null : Math.max(0, Math.min(Math.round(v), 999999999));
     renderDeposit(!(opts && opts.keepInput));
     renderMini();
     evaluateAll();
@@ -314,10 +298,10 @@
 
   function renderMini() {
     $('#miniChips').innerHTML =
-      '<span class="mini-chip"><b>' + esc(state.residence) + '</b></span>' +
-      '<span class="mini-chip"><b>' + esc(state.housing) + '</b></span>' +
-      '<span class="mini-chip"><b>' + (state.deposit === 0 ? '예치금 없음' : '예치금 ' + moneyChip(state.deposit)) + '</b></span>' +
-      '<span class="mini-chip">' + esc(state.householder) + '</span>';
+      '<span class="mini-chip"><b>' + esc(state.residence || '거주지 미입력') + '</b></span>' +
+      '<span class="mini-chip"><b>' + esc(state.housing || '주택 수 미입력') + '</b></span>' +
+      '<span class="mini-chip"><b>' + (state.deposit == null ? '예치금 미입력' : '예치금 ' + moneyChip(state.deposit)) + '</b></span>' +
+      '<span class="mini-chip">' + esc(state.householder || '세대주 여부 미입력') + '</span>';
   }
 
   /* ───────────────────────── 결과 ───────────────────────── */
@@ -401,6 +385,11 @@
   }
 
   function reasonsFor(e) {
+    if (e.checks) {
+      var ordered = e.checks.slice().sort(function (a, b) { return ({ fail: 0, pass: 1, not_applicable: 1, unknown: 2 })[a.status] - ({ fail: 0, pass: 1, not_applicable: 1, unknown: 2 })[b.status]; });
+      var shown = ordered.map(function (r) { return { t: r.status === 'fail' ? 'no' : r.status === 'unknown' ? 'warn' : 'ok', text: r.label + ': ' + r.text }; });
+      return { shown: shown, extra: 0 };
+    }
     var items = [];
     e.fails.forEach(function (f) { items.push({ t: 'no', text: f.text }); });
     e.warns.forEach(function (w) { items.push({ t: 'warn', text: w }); });
@@ -466,7 +455,7 @@
         note: applyNote(L, st) };
     }
     if (!ok) {
-      return { kind: 'no', label: '내 조건으로는 신청 불가 · 공고 보기', short: '공고 보기',
+      return { kind: 'no', label: '입력 조건 확인 · 공고 보기', short: '공고 보기',
         url: detailUrl, path: path, tone: 'muted', note: '' };
     }
     return { kind: 'detail', label: '청약홈 공고 보기', short: '공고 보기',
@@ -535,7 +524,7 @@
           '<div class="card-fact"><span>예치금</span><b>' + esc(dep) + '</b></div>' +
         '</div>' +
         '<div class="card-verdict">' +
-          '<span class="verdict ' + (e.ok ? 'verdict-ok' : 'verdict-no') + '">' +
+          '<span class="verdict ' + (e.unknown ? 'verdict-review' : e.ok ? 'verdict-ok' : 'verdict-no') + '">' +
             (e.unknown ? '! 자격 확인 필요' : e.ok ? '✓ 입력 조건 부합' : '✕ 입력 조건 미달') +
           '</span>' +
         '</div>' +
@@ -572,7 +561,8 @@
     $('#eligibleHead').textContent = labels[state.filter] || '전체 공고';
     $('#eligibleCount').textContent = filterList().length;
     $('#resultsSub').innerHTML =
-      '입력 조건 부합 <b>' + c.ok + '건</b> · 조건 미달 ' + c.excluded + '건 · 자격 확인 필요 ' + c.unknown + '건';
+      '입력 조건 부합 <b>' + c.ok + '건</b> · 조건 미달 ' + c.excluded + '건 · 자격 확인 필요 ' + c.unknown + '건' +
+      '<br>원문 대조된 공고 ' + evalCache.filter(function (e) { return e.reviewUsable; }).length + '/' + c.total + '건 · 최종 자격은 별도 확인';
 
     $('#segFilter').innerHTML = [
       { v: 'eligible', l: '조건 부합', n: c.ok },
@@ -615,7 +605,7 @@
     }
     return '<div class="empty"><div class="empty-emoji">🔍</div>' +
       '<p class="empty-title">지금 조건에 맞는 공고가 없어요</p>' +
-      '<p class="empty-copy">주택 수·거주지·예치금을 바꾸면<br>신청 가능한 공고가 나타날 수 있어요.</p>' +
+      '<p class="empty-copy">입력값과 원문 검토 범위를 확인해 주세요.<br>확인 필요 탭에서 미확인 조건을 볼 수 있어요.</p>' +
       '<button type="button" class="empty-btn" data-edit-cond>조건 바꾸기</button></div>';
   }
 
@@ -628,12 +618,12 @@
       var rows = keys.sort().map(function (k) {
         var names = cm.groups[k].map(function (L) { return L.name; });
         return '<p class="overlap-item"><b>' + mdw(k) + '</b> ' + esc(names.join(' · ')) +
-          ' — 발표일이 같아 1인 1건만 신청할 수 있어요.</p>';
+          ' — 중복신청 제한과 예외를 각 공고문에서 확인하세요.</p>';
       }).join('');
       host.innerHTML = '<div class="overlap" role="status">' +
         '<span class="overlap-ico">!</span>' +
         '<div class="overlap-body">' +
-          '<p class="overlap-title">당첨자 발표일이 겹칩니다 — 1곳만 유효해요</p>' +
+          '<p class="overlap-title">당첨자 발표일이 겹칩니다 — 중복신청 제한 확인</p>' +
           '<div class="overlap-list">' + rows + '</div>' +
         '</div></div>';
       return;
@@ -643,7 +633,7 @@
         '<span class="overlap-ico">✓</span>' +
         '<div class="overlap-body">' +
           '<p class="overlap-title">관심 ' + state.favs.length + '곳 — 발표일이 모두 달라요</p>' +
-          '<p class="overlap-item">발표일이 다르면 각각 신청할 수 있어요. 다만 빠른 공고에 당첨되면 늦은 공고 당첨은 자동 취소돼요.</p>' +
+          '<p class="overlap-item">발표일이 달라도 신청·당첨 제한이 있을 수 있어요. 각 공고문의 제한과 예외를 확인하세요.</p>' +
         '</div></div>';
       return;
     }
@@ -692,6 +682,11 @@
   }
 
   function evidenceHTML(L) {
+    if (L.eligibility && L.eligibility.state === 'reviewed') {
+      var review = L.eligibility;
+      return '<p class="review-meta">공고일 ' + esc(L.announceDate) + ' 기준 · 검토일 ' + esc(review.reviewedAt) + ' · 원본 대조 ' + esc(review.checkedAt) + '</p>' +
+        '<p class="review-meta">소득·자산·나이·거주기간·신청 제한 등 전체 자격 검증을 완료했다는 뜻은 아닙니다.</p>';
+    }
     var ev = L.evidence || {};
     var rows = [], seen = [];
     function add(k, v) {
@@ -709,6 +704,15 @@
     return '<div class="d-quote">' + rows.map(function (r) {
       return '<p class="d-quote-row"><b>' + esc(r.k) + '</b> ' + esc(r.v) + '</p>';
     }).join('') + '</div>';
+  }
+
+  function conditionChecksHTML(e) {
+    var labels = { pass: '입력 조건 부합', fail: '입력 조건 미달', unknown: '확인 필요', not_applicable: '해당 요건 없음' };
+    return '<ul class="condition-checks">' + (e.checks || []).map(function (r) {
+      var source = r.quote ? '<blockquote>' + esc(r.quote) + '</blockquote>' : '';
+      if (r.page && r.sourceUrl) source += '<a href="' + esc(r.sourceUrl + '#page=' + r.page) + '" target="_blank" rel="noopener">공고문 ' + r.page + '쪽에서 확인 ↗</a>';
+      return '<li class="condition-check condition-check--' + r.status + '"><div class="check-heading"><b>' + esc(r.label) + '</b><span>' + labels[r.status] + '</span></div><p>' + esc(r.text) + '</p>' + source + '</li>';
+    }).join('') + '</ul>';
   }
 
   function drawerHTML(e) {
@@ -751,13 +755,17 @@
         '<h2 class="drawer-title" id="drawerTitle">' + esc(L.name) + '</h2>' +
         '<p class="drawer-loc">' + esc(L.region) + ' ' + esc(L.district || '') + ' · ' +
           esc(L.units ? num(L.units) + '세대' : '물량 미확인') + '</p>' +
-        '<div class="drawer-verdict ' + (e.ok ? 'ok' : 'no') + '">' +
+        '<div class="drawer-verdict ' + (e.unknown ? 'review' : e.ok ? 'ok' : 'no') + '">' +
           '<p class="dv-title">' + (e.unknown ? '! 신청 자격 확인 필요' : e.ok ? '✓ 입력 조건 부합 · 추가 자격 확인 필요' : '✕ 입력 조건 ' + e.fails.length + '가지 미달') + '</p>' +
           verdictLines +
         '</div>' +
       '</div>' +
       '<div class="drawer-body-inner">' +
         applyBoxHTML(e) +
+        '<section class="d-sec">' +
+          '<h3 class="d-sec-title">입력 조건별 확인 결과</h3>' +
+          conditionChecksHTML(e) +
+        '</section>' +
         '<section class="d-sec">' +
           '<h3 class="d-sec-title">공고문 원문 근거</h3>' +
           evidenceHTML(L) +
@@ -973,7 +981,7 @@
       setDeposit(parseWon(ev.target.value), { keepInput: true });
     });
     dInput.addEventListener('blur', function () {
-      dInput.value = state.deposit ? num(state.deposit) : '';
+    dInput.value = state.deposit == null ? '' : num(state.deposit);
     });
     dInput.addEventListener('keydown', function (ev) {
       if (ev.key === 'Enter') { ev.preventDefault(); dInput.blur(); }

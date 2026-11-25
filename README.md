@@ -7,7 +7,7 @@
 - HTML / CSS / JavaScript, 외부 프런트엔드 라이브러리 없음.
 - 기존 data/listings.json은 2026-11-25 기준으로 저장된 38건의 공고입니다. 이번 작업에서 실제 API로 재검증하지 않았습니다.
 - 공식 API 자동 수집 코드와 GitHub Actions 실행·Pages 배포 설정을 추가했습니다. 인증키 등록과 GitHub 반영 전에는 예약 갱신이 동작하지 않습니다.
-- 공고 일정 갱신과 신청 자격 검증은 별개입니다. 새 API 공고는 모두 ‘자격 확인 필요’로 표시합니다. 기존 수동 자격 판정을 자동 승계하지 않습니다.
+- 공고 일정 갱신과 신청 자격 검증은 별개입니다. 공식 공고문을 검토한 3건에 항목별 근거를 연결했습니다. 그 밖의 공고는 ‘자격 확인 필요’로 표시합니다. [검토 범위와 한계](docs/eligibility.md)를 확인하세요.
 
 ## Windows에서 실행
 
@@ -51,12 +51,14 @@ node --check app.js
 - data/sync-status.json: 자동 갱신 상태. 인증키는 포함하지 않습니다.
 - scripts/sync_applyhome.py: 공식 API 5종 목록과 주택형 데이터를 수집합니다.
 - tests/test_sync_applyhome.py: 수집 및 실패 보존 테스트.
+- scripts/eligibility_rules.py / data/eligibility-rules.json: 검토 원본 대조 및 항목별 자격 근거.
+- tests/test_eligibility_rules.py / tests/eligibility.test.cjs: 원본 변경과 만료, 미입력, 경계값, 조건별 판정 테스트.
 - .github/workflows/sync-applyhome.yml: 정기 실행, 데이터 커밋, Pages 배포.
 - docs/data-sync.md: 출처, 제공 범위, 이용 조건 확인, 설정 절차와 제한.
 
 ## 출시 전 남은 작업
 
 - 실제 인증키로 데이터 연동과 배포를 검증하고 운영계정 승인·트래픽 조건을 확인합니다.
-- 공고문 자격 검증 범위를 설계합니다. 일부 입력 조건에 맞는다고 최종 신청 자격을 보장하지 않습니다.
+- 공고문 검토 범위를 확대합니다. 현재 3건의 일부 입력 조건을 검토했으며 전체 자격 검증이 아닙니다.
 - 알림, iOS 앱 전환, 개인정보 안내, 수익화는 후속 작업입니다.
 - 광고 영역은 예시이며 실제 광고가 연결되어 있지 않습니다.

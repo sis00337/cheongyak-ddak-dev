@@ -1359,3 +1359,14 @@ button:focus-visible, [tabindex]:focus-visible, select:focus-visible, input:focu
 .sync-status { margin: 0 0 16px; padding: 14px 16px; border-radius: 12px; background: #edf6ff; color: #244563; font-size: 13px; line-height: 1.65; overflow-wrap: anywhere; }
 .sync-status--warning { background: #fff5dd; color: #704b08; }
 .seg-filter { flex-wrap: wrap; }
+.verdict-review { color: #805400; background: #fff4d6; }
+.drawer-verdict.review { background: #fff7e5; color: #704b08; border-color: #edd8a8; }
+.condition-checks { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.condition-check { padding: 14px; border: 1px solid #e5e8eb; border-radius: 12px; line-height: 1.6; }
+.check-heading { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; font-size: 13px; }
+.check-heading span { color: #805400; }
+.condition-check--pass .check-heading span, .condition-check--not_applicable .check-heading span { color: #167252; }
+.condition-check--fail .check-heading span { color: #b33a32; }
+.condition-check p, .condition-check blockquote { font-size: 13px; margin: 8px 0 0; }
+.condition-check blockquote { border-left: 3px solid #d5e4f5; padding-left: 10px; color: #536477; }
+.condition-check a, .review-meta { display: block; margin-top: 8px; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }

@@ -10,6 +10,10 @@ from pathlib import Path
 from urllib.error import HTTPError, URLError
 from urllib.parse import urlencode, unquote, urlparse
 from urllib.request import Request, urlopen
+try:
+    from scripts.eligibility_rules import apply_reviews, load_rules, pdf_digest
+except ImportError:
+    from eligibility_rules import apply_reviews, load_rules, pdf_digest
 
 ROOT = Path(__file__).resolve().parents[1]
 KST = timezone(timedelta(hours=9))
@@ -138,6 +142,9 @@ class Client:
                 raise SyncError('API 페이지 일부 누락')
         raise SyncError('API 페이지 한도 초과')
 
+    def pdf_digest(self, url):
+        return pdf_digest(url, urlopen)
+
 
 def normalize(row, category, models):
     manage, notice = identity(row)
@@ -219,18 +226,20 @@ def collect(client, today):
     return listings, scanned
 
 
-def run(client, output, status_path, now=None):
+def run(client, output, status_path, now=None, rules_path=None):
     now = now or datetime.now(KST)
     stamp = now.isoformat(timespec='seconds')
     previous = read_json(status_path, {})
     try:
         listings, scanned = collect(client, now.date().isoformat())
+        rules = load_rules(rules_path or ROOT / 'data/eligibility-rules.json')
+        counts = apply_reviews(listings, rules, client.pdf_digest if hasattr(client, 'pdf_digest') else lambda url: None, now)
         document = {'meta': {
             'source': '한국부동산원 청약홈 분양정보 조회 서비스', 'sourceUrl': SOURCE,
             'collectedAt': now.date().isoformat(), 'updatedAt': stamp, 'count': len(listings),
             'scope': '전국 · APT / 무순위·잔여세대 / 오피스텔·기타 / 공공지원민간임대 / 임의공급',
-            'unit': '금액 단위: 만 원', 'scannedCounts': scanned,
-            'unverified': [x['id'] for x in listings]}, 'listings': listings}
+            'unit': '금액 단위: 만 원', 'scannedCounts': scanned, 'eligibilityCounts': counts,
+            'unverified': [x['id'] for x in listings if not x['verified']]}, 'listings': listings}
         atomic_json(output, document)
     except Exception as exc:
         # 알 수 없는 예외도 키나 응답 본문이 노출되지 않도록 타입만 기록한다.
