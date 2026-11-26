@@ -577,6 +577,8 @@ button:focus-visible, [tabindex]:focus-visible, select:focus-visible, input:focu
 .chip-type { background: #f4f1fb; color: #6b53a8; }
 .chip-warn { background: var(--warn-bg); color: var(--warn); }
 .chip-muted { background: var(--line-soft); color: var(--ink-3); }
+.chip-auto { background: #eef4ff; color: #2563eb; }
+.review-summary { margin-top: 4px; font-size: 14px; line-height: 1.65; color: var(--ink); font-weight: 600; }
 
 .dday {
   flex: none;

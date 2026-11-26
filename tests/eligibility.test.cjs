@@ -92,3 +92,32 @@ test('calendar export leaves out dates already past in Korea', () => {
   assert.doesNotMatch(ics, /x3-start/);
   assert.match(ics, /x3-end/);
 });
+
+const { standardDeposit, smallestArea } = require('../app.js');
+
+test('standard deposit table follows residence group and smallest unit', () => {
+  assert.equal(standardDeposit('서울', 59.71), 3000000);
+  assert.equal(standardDeposit('부산', 101), 6000000);
+  assert.equal(standardDeposit('대구', 84.9), 2500000);
+  assert.equal(standardDeposit('경기', 120), 4000000);
+  assert.equal(standardDeposit('제주', 140), 5000000);
+  assert.equal(smallestArea({ types: [{ label: '084.9500A' }, { label: '059.7100A' }] }), 59.71);
+  assert.equal(smallestArea({ types: [{ label: '오피스텔' }] }), null);
+});
+
+test('auto-analysed listing uses its evidence and computes the standard deposit', () => {
+  const now = new Date('2026-11-26T09:00:00Z');
+  const listing = { types: [{ label: '059.7100A' }], eligibility: { state: 'auto', checkedAt: now.toISOString(), validUntil: '2026-12-31',
+    sourceUrl: 'https://static.applyhome.co.kr/x', checks: {
+      housing: { kind: 'none', page: 2, quote: '무주택세대구성원' },
+      residence: { kind: 'regions', values: ['서울'], page: 2, quote: '서울특별시 거주' },
+      deposit: { kind: 'standard_table', page: 3, quote: '지역별 예치금액' },
+      householder: { kind: 'required', page: 2, quote: '세대주' } },
+    manualChecks: [{ label: '재당첨', note: '확인', page: 3 }] } };
+  const ok = evaluate(listing, { housing: '무주택', residence: '서울', deposit: 3000000, householder: '세대주' }, {}, now);
+  assert.equal(ok.ok, true);
+  assert.equal(ok.reviewUsable, true);
+  const short = evaluate(listing, { housing: '무주택', residence: '서울', deposit: 2000000, householder: '세대주' }, {}, now);
+  assert.equal(short.ok, false);
+  assert.match(short.fails[0].text, /1,000,000원 부족/);
+});

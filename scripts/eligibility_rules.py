@@ -9,7 +9,7 @@ from urllib.parse import parse_qs, urlparse
 
 REGIONS = {'서울', '경기', '인천', '부산', '울산', '경남', '대구', '경북', '대전', '세종', '충북', '충남', '광주', '전북', '전남', '강원', '제주'}
 KINDS = {'housing': {'none', 'max_one', 'not_required'}, 'residence': {'regions'},
-         'deposit': {'minimum', 'not_required'}, 'householder': {'required', 'not_required'}}
+         'deposit': {'minimum', 'not_required', 'standard_table'}, 'householder': {'required', 'not_required'}}
 
 
 def validate_rule(rule):
@@ -65,13 +65,7 @@ def apply_reviews(listings, rules, fetch_digest, now):
     counts = {'reviewed': 0, 'needsReview': 0}
     today = now.date().isoformat()
     for listing in listings:
-        listing.update(housingRequirement='확인 필요', requiredDeposit=None,
-                       depositNote='공고문에서 예치금·납입 요건 확인 필요',
-                       residenceRequirement='확인 필요', eligibleRegions=[], priorityRegions=[],
-                       householderOnly=None, evidence={}, extraRequirements=['신청 자격은 공고문에서 확인해야 합니다'])
-        listing['verified'] = False
-        listing['eligibilityStatus'] = 'needs_review'
-        listing['eligibility'] = {'state': 'needs_review', 'reason': '공고문 항목별 검토 전입니다.'}
+        reset_listing(listing)
         rule = rules.get((listing['houseManageNo'], listing['pblancNo']))
         reason = None
         if rule:
@@ -87,34 +81,55 @@ def apply_reviews(listings, rules, fetch_digest, now):
                 except Exception:
                     reason = '현재 공고문 원본을 대조하지 못해 자격 판정을 보류합니다.'
             if not reason:
-                listing['verified'] = True  # 원문 일치 여부. 최종 신청 가능 판정을 뜻하지 않는다.
-                listing['eligibilityStatus'] = 'partial_review'
-                listing['pdfUrl'] = rule['source']['url']
-                listing['eligibility'] = {
-                    'state': 'reviewed', 'checkedAt': now.isoformat(timespec='seconds'),
-                    'reviewedAt': rule['reviewedAt'], 'validUntil': rule['validUntil'],
-                    'sourceUrl': rule['source']['url'], 'sourceSha256': digest,
-                    'checks': copy.deepcopy(rule['checks']), 'manualChecks': copy.deepcopy(rule['manualChecks']),
-                }
-                checks = rule['checks']
-                housing = checks.get('housing', {}).get('kind')
-                listing['housingRequirement'] = {'none': '무주택 전용', 'max_one': '1주택 가능', 'not_required': '무관'}.get(housing, '확인 필요')
-                residence = checks.get('residence', {}).get('values', [])
-                listing['eligibleRegions'] = list(residence)
-                listing['residenceRequirement'] = '전국' if len(residence) == 17 else '·'.join(residence) or '확인 필요'
-                deposit = checks.get('deposit', {})
-                listing['requiredDeposit'] = 0 if deposit.get('kind') == 'not_required' else (deposit['amountWon'] / 10000 if deposit.get('kind') == 'minimum' else None)
-                listing['depositNote'] = '공고문에서 청약통장 불필요 확인' if deposit.get('kind') == 'not_required' else '공고문에서 검토한 기준. 추가 조건은 원문 확인'
-                head = checks.get('householder', {}).get('kind')
-                listing['householderOnly'] = True if head == 'required' else False if head == 'not_required' else None
-                listing['extraRequirements'] = [item['label'] + ': ' + item['note'] for item in rule['manualChecks']]
+                attach_review(listing, rule, digest, now)
         if reason:
             listing['eligibility']['reason'] = reason
         counts['reviewed' if listing['verified'] else 'needsReview'] += 1
     return counts
 
 
-def pdf_digest(url, opener):
+def reset_listing(listing):
+    """자격 관련 표시값을 '확인 필요' 상태로 되돌린다."""
+    listing.update(housingRequirement='확인 필요', requiredDeposit=None,
+                   depositNote='공고문에서 예치금·납입 요건 확인 필요',
+                   residenceRequirement='확인 필요', eligibleRegions=[], priorityRegions=[],
+                   householderOnly=None, evidence={}, extraRequirements=['신청 자격은 공고문에서 확인해야 합니다'])
+    listing['verified'] = False
+    listing['eligibilityStatus'] = 'needs_review'
+    listing['eligibility'] = {'state': 'needs_review', 'reason': '공고문 항목별 검토 전입니다.'}
+
+
+def attach_review(listing, rule, digest, now, state='reviewed', extra=None):
+    """검증을 통과한 검토 결과(사람 검토 또는 자동 분석)를 공고에 붙인다."""
+    listing['verified'] = True  # 원문 일치 여부. 최종 신청 가능 판정을 뜻하지 않는다.
+    listing['eligibilityStatus'] = 'partial_review' if state == 'reviewed' else 'auto_review'
+    listing['pdfUrl'] = rule['source']['url']
+    listing['eligibility'] = dict({
+        'state': state, 'checkedAt': now.isoformat(timespec='seconds'),
+        'reviewedAt': rule['reviewedAt'], 'validUntil': rule['validUntil'],
+        'sourceUrl': rule['source']['url'], 'sourceSha256': digest,
+        'checks': copy.deepcopy(rule['checks']), 'manualChecks': copy.deepcopy(rule['manualChecks']),
+    }, **(extra or {}))
+    checks = rule['checks']
+    housing = checks.get('housing', {}).get('kind')
+    listing['housingRequirement'] = {'none': '무주택 전용', 'max_one': '1주택 가능', 'not_required': '무관'}.get(housing, '확인 필요')
+    residence = checks.get('residence', {}).get('values', [])
+    listing['eligibleRegions'] = list(residence)
+    listing['residenceRequirement'] = '전국' if len(residence) == 17 else '·'.join(residence) or '확인 필요'
+    deposit = checks.get('deposit', {})
+    kind = deposit.get('kind')
+    listing['requiredDeposit'] = 0 if kind == 'not_required' else (deposit['amountWon'] / 10000 if kind == 'minimum' else None)
+    listing['depositNote'] = {
+        'not_required': '공고문에서 청약통장 불필요 확인',
+        'minimum': '공고문에서 확인한 기준. 추가 조건은 원문 확인',
+        'standard_table': '지역·면적별 예치금 기준 적용 (거주지와 가장 작은 주택형으로 계산)',
+    }.get(kind, '공고문에서 예치금·납입 요건 확인 필요')
+    head = checks.get('householder', {}).get('kind')
+    listing['householderOnly'] = True if head == 'required' else False if head == 'not_required' else None
+    listing['extraRequirements'] = [item['label'] + ': ' + item['note'] for item in rule['manualChecks']]
+
+
+def pdf_bytes(url, opener):
     with opener(url, timeout=25) as response:
         final = urlparse(response.geturl())
         if final.scheme != 'https' or final.hostname != 'static.applyhome.co.kr':
@@ -122,4 +137,8 @@ def pdf_digest(url, opener):
         body = response.read(10 * 1024 * 1024 + 1)
     if not body.startswith(b'%PDF-') or len(body) > 10 * 1024 * 1024:
         raise ValueError('공고문 PDF 형식·크기 오류')
-    return hashlib.sha256(body).hexdigest()
+    return body
+
+
+def pdf_digest(url, opener):
+    return hashlib.sha256(pdf_bytes(url, opener)).hexdigest()

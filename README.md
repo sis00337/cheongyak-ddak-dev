@@ -53,6 +53,7 @@ node --check app.js
 - scripts/sync_applyhome.py: 공식 API 5종 목록과 주택형 데이터를 수집합니다.
 - tests/test_sync_applyhome.py: 수집 및 실패 보존 테스트.
 - scripts/eligibility_rules.py / data/eligibility-rules.json: 검토 원본 대조 및 항목별 자격 근거.
+- scripts/auto_eligibility.py / data/auto-eligibility.json: 공고문 PDF를 Claude로 자동 분석하고 근거 문장을 원문과 대조. Secret `ANTHROPIC_API_KEY` 필요. [설명](docs/eligibility.md#공고문-자동-분석-ai)
 - tests/test_eligibility_rules.py / tests/eligibility.test.cjs: 원본 변경과 만료, 미입력, 경계값, 조건별 판정 테스트.
 - .github/workflows/sync-applyhome.yml: 정기 실행, 데이터 커밋, Pages 배포.
 - docs/data-sync.md: 출처, 제공 범위, 이용 조건 확인, 설정 절차와 제한.

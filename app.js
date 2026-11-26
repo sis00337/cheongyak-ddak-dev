@@ -12,7 +12,7 @@
     var today = new Date(now.getTime() + 9 * 3600000).toISOString().slice(0, 10);
     var review = listing.eligibility || {};
     var checked = Date.parse(review.checkedAt || '');
-    var usable = review.state === 'reviewed' && review.validUntil >= today &&
+    var usable = (review.state === 'reviewed' || review.state === 'auto') && review.validUntil >= today &&
       isFinite(checked) && now.getTime() - checked <= 30 * 3600000 && checked <= now.getTime() + 60000;
     var definitions = usable ? review.checks || {} : {};
     var rows = Object.keys(labels).map(function (key) {
@@ -39,6 +39,14 @@
         if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; return row; }
         pass = input >= rule.amountWon;
         row.text = pass ? '입력한 예치금이 확인된 기준에 부합합니다.' : '예치금 ' + (rule.amountWon - input).toLocaleString('ko-KR') + '원 부족';
+      } else if (key === 'deposit' && rule.kind === 'standard_table') {
+        var area = smallestArea(listing);
+        var need = regions.indexOf(profile.residence) === -1 || area == null ? null : standardDeposit(profile.residence, area);
+        if (need == null) { row.text = '거주 시도를 선택하면 지역·면적별 예치금 기준으로 계산해요.'; return row; }
+        if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; return row; }
+        pass = input >= need;
+        row.text = (pass ? '' : '예치금 ' + (need - input).toLocaleString('ko-KR') + '원 부족 · ') +
+          profile.residence + ' 거주, 가장 작은 주택형(' + area + '㎡) 기준 ' + (need / 10000).toLocaleString('ko-KR') + '만 원';
       } else if (key === 'householder' && rule.kind === 'required') {
         if (['세대주', '세대원'].indexOf(input) === -1) { row.text = '공고일 기준 세대주 여부를 선택해 주세요.'; return row; }
         pass = input === '세대주'; row.text = pass ? '입력한 세대주 조건이 부합합니다.' : '세대주 요건에 맞지 않습니다.';
@@ -57,6 +65,27 @@
       ok: !fails.length && !missing.length, unknown: !fails.length && !!missing.length,
       reviewUsable: usable, reviewedCount: Object.keys(definitions).length };
   }
+  /* 주택공급에 관한 규칙 별표 2의 민영주택 청약 예치기준금액(원). 주민등록 거주지 기준. */
+  var DEPOSIT_TABLE = {
+    capital: [3000000, 6000000, 10000000, 15000000],   /* 특별시·부산광역시 */
+    metro: [2500000, 4000000, 7000000, 10000000],      /* 그 밖의 광역시 */
+    other: [2000000, 3000000, 4000000, 5000000]        /* 특별시·광역시를 제외한 지역 */
+  };
+  function standardDeposit(residence, area) {
+    var group = (residence === '서울' || residence === '부산') ? 'capital'
+      : ['인천', '대구', '광주', '대전', '울산'].indexOf(residence) !== -1 ? 'metro' : 'other';
+    var idx = area <= 85 ? 0 : area <= 102 ? 1 : area <= 135 ? 2 : 3;
+    return DEPOSIT_TABLE[group][idx];
+  }
+  /* 주택형 라벨(예: "059.7100A")에서 전용면적을 읽어 가장 작은 값을 쓴다. */
+  function smallestArea(listing) {
+    var areas = (listing.types || []).map(function (t) {
+      var m = String(t.label || '').match(/^0*(\d+(?:\.\d+)?)/);
+      return m ? Number(m[1]) : NaN;
+    }).filter(function (n) { return isFinite(n) && n > 10 && n < 400; });
+    return areas.length ? Math.round(Math.min.apply(null, areas) * 100) / 100 : null;
+  }
+
   /* 만 원 단위 금액을 "6억 1,345만 원"처럼 읽기 쉽게 바꾼다. */
   function formatManwon(n) {
     if (n == null || !isFinite(n)) return '';
@@ -126,7 +155,7 @@
     return lines.join('\r\n') + '\r\n';
   }
 
-  return { evaluate: evaluate, regions: regions, formatManwon: formatManwon, formatPriceRange: formatPriceRange, buildICS: buildICS };
+  return { evaluate: evaluate, regions: regions, standardDeposit: standardDeposit, smallestArea: smallestArea, formatManwon: formatManwon, formatPriceRange: formatPriceRange, buildICS: buildICS };
 });
 
 /* =========================================================
@@ -551,6 +580,15 @@
     '</section>';
   }
 
+  /* 지역·면적별 기준을 쓰는 공고는 내 거주지로 필요한 예치금을 계산해 보여 준다. */
+  function depositLabel(e) {
+    var rule = e.reviewUsable && e.l.eligibility && e.l.eligibility.checks && e.l.eligibility.checks.deposit;
+    if (!rule || rule.kind !== 'standard_table') return '';
+    var area = E.smallestArea(e.l);
+    if (!state.residence || area == null) return '지역별 기준';
+    return num(E.standardDeposit(state.residence, area) / 10000) + '만';
+  }
+
   function cardHTML(row) {
     var e = row.e, L = e.l, st = e.status;
     var isFav = state.favs.indexOf(L.id) !== -1;
@@ -560,11 +598,12 @@
       '<span class="chip chip-type">' + esc(L.supplyType) + '</span>';
     if (row.conflict) chips += '<span class="chip chip-warn">발표일 중복</span>';
     if (!L.verified) chips += '<span class="chip chip-muted">원문 미확인</span>';
+    else if (L.eligibility && L.eligibility.state === 'auto' && e.reviewUsable) chips += '<span class="chip chip-auto">AI 공고문 분석</span>';
 
     var price = L.priceMin == null ? '가격 미확인' : (E.formatPriceRange(L.priceMin, L.priceMax) || L.priceRange);
     var priceLabel = L.priceLabel || '분양가';
     var units = L.units == null ? '물량 미확인' : num(L.units) + '세대';
-    var dep = L.requiredDeposit == null ? '확인 필요' : L.requiredDeposit > 0 ? num(L.requiredDeposit) + '만' : '없음';
+    var dep = depositLabel(e) || (L.requiredDeposit == null ? '확인 필요' : L.requiredDeposit > 0 ? num(L.requiredDeposit) + '만' : '없음');
 
     var reasonsHTML = rs.shown.map(function (r) {
       var ico = r.t === 'no' ? '✕' : r.t === 'warn' ? '!' : '✓';
@@ -738,6 +777,13 @@
   }
 
   function evidenceHTML(L) {
+    if (L.eligibility && L.eligibility.state === 'auto') {
+      var a = L.eligibility;
+      return (a.summary ? '<p class="review-summary">' + esc(a.summary) + '</p>' : '') +
+        '<p class="review-meta">AI가 공고문을 분석한 결과예요 · 분석일 ' + esc(String(a.analyzedAt || '').slice(0, 10)) +
+        ' · 근거 문장은 공고문 원문과 대조했어요</p>' +
+        '<p class="review-meta">틀릴 수 있으니 신청 전에 근거 쪽을 한 번 열어 확인해 주세요. 소득·자산·나이·재당첨 제한 등은 아래 추가 확인 사항을 보세요.</p>';
+    }
     if (L.eligibility && L.eligibility.state === 'reviewed') {
       var review = L.eligibility;
       return '<p class="review-meta">공고일 ' + esc(L.announceDate) + ' 기준 · 검토일 ' + esc(review.reviewedAt) + ' · 원본 대조 ' + esc(review.checkedAt) + '</p>' +
@@ -782,7 +828,8 @@
       ? '<div class="d-tip">' + e.warns.map(function (w) { return '· ' + esc(w); }).join('<br>') + '</div>'
       : '';
 
-    var depositCell = L.requiredDeposit == null ? '공고문 확인 필요' : L.requiredDeposit > 0
+    var depositCell = depositLabel(e) ? esc(depositLabel(e) + (depositLabel(e) === '지역별 기준' ? ' (거주지를 선택하면 계산해요)' : ' 원 (내 거주지·가장 작은 주택형 기준)'))
+      : L.requiredDeposit == null ? '공고문 확인 필요' : L.requiredDeposit > 0
       ? num(L.requiredDeposit) + '만 원' + (state.deposit < L.requiredDeposit * 10000
         ? ' <b style="color:var(--no)">(부족 ' + moneyLabel(L.requiredDeposit * 10000 - state.deposit) + ')</b>' : ' (충족)')
       : '요건 없음';
