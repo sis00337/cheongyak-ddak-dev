@@ -5,7 +5,10 @@
 - 같은 PDF(SHA-256)는 한 번만 분석하고 data/auto-eligibility.json에 저장해 재사용한다.
 - Claude가 돌려준 근거 문장은 PDF에서 추출한 해당 쪽 텍스트에 실제로 있어야만 쓴다.
   원문에서 찾지 못한 조건은 버리고 '확인 필요'로 남긴다.
-- ANTHROPIC_API_KEY가 없으면 새 분석은 하지 않고, 저장된 분석 중 PDF가 그대로인 것만 다시 붙인다.
+- 분석은 두 가지 방법 중 하나로 한다.
+  ANTHROPIC_API_KEY가 있으면 Anthropic API(SDK)를, 없고 CLAUDE_CODE_OAUTH_TOKEN이 있으면
+  Claude 구독으로 로그인한 Claude Code CLI(`claude -p`)를 쓴다.
+  둘 다 없으면 새 분석은 하지 않고, 저장된 분석 중 PDF가 그대로인 것만 다시 붙인다.
 - 공고 하나의 실패가 다른 공고나 공고 데이터 갱신을 막지 않는다.
 """
 import hashlib
@@ -13,6 +16,8 @@ import io
 import json
 import os
 import re
+import shutil
+import subprocess
 import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
@@ -143,6 +148,8 @@ def build_document(listing, pages):
 
 def ask_claude(client, listing, pages):
     """Claude에게 구조화된 분석을 요청한다. 거절·잘림이면 None."""
+    if isinstance(client, CliClient):
+        return client.analyze(build_document(listing, pages))
     response = client.beta.messages.create(
         model=MODEL,
         max_tokens=16000,
@@ -156,6 +163,29 @@ def ask_claude(client, listing, pages):
         return None
     text = next((b.text for b in response.content if b.type == 'text'), '')
     return json.loads(text)
+
+
+class CliClient:
+    """Claude 구독 토큰으로 Claude Code CLI를 비대화형으로 실행한다. 도구는 모두 끈다."""
+    model = 'opus'
+
+    def __init__(self, binary='claude', runner=subprocess.run):
+        self.binary, self.runner = binary, runner
+
+    def analyze(self, document):
+        env = dict(os.environ)
+        env.pop('ANTHROPIC_API_KEY', None)  # 비어 있는 키가 구독 토큰보다 우선하지 않게 한다.
+        cmd = [self.binary, '-p', '표준 입력의 공고문 텍스트를 지침대로 분석해 스키마에 맞춰 답하세요.',
+               '--model', self.model, '--tools', '', '--max-turns', '3',
+               '--system-prompt', SYSTEM, '--output-format', 'json', '--json-schema', json.dumps(SCHEMA, ensure_ascii=False)]
+        done = self.runner(cmd, input=document, capture_output=True, text=True, timeout=900, env=env)
+        if done.returncode != 0:
+            return None
+        result = json.loads(done.stdout or '{}')
+        if result.get('is_error'):
+            return None
+        output = result.get('structured_output')
+        return output if isinstance(output, dict) else None
 
 
 def verify(raw, pages):
@@ -295,8 +325,12 @@ def main():
     if os.environ.get('ANTHROPIC_API_KEY', '').strip():
         import anthropic
         client = anthropic.Anthropic()
+        print('Anthropic API로 분석합니다.')
+    elif os.environ.get('CLAUDE_CODE_OAUTH_TOKEN', '').strip() and shutil.which('claude'):
+        client = CliClient(shutil.which('claude'))
+        print('Claude 구독(Claude Code CLI)으로 분석합니다.')
     else:
-        print('ANTHROPIC_API_KEY가 없어 새 공고는 분석하지 않고 저장된 분석만 적용합니다.')
+        print('분석 인증 정보가 없어 새 공고는 분석하지 않고 저장된 분석만 적용합니다.')
     now = datetime.now(KST)
     new_cache, counts = run(document['listings'], cache, Fetcher(), client, now)
     meta = document['meta']

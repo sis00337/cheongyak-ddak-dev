@@ -148,6 +148,31 @@ class AutoEligibilityTests(unittest.TestCase):
         self.assertEqual(chosen[:3], [0, 1, 2])
         self.assertIn(8, chosen)
 
+    def test_subscription_cli_runs_without_tools_and_api_key(self):
+        seen = {}
+
+        def runner(cmd, **kwargs):
+            seen['cmd'], seen['env'], seen['input'] = cmd, kwargs['env'], kwargs['input']
+            out = {'type': 'result', 'is_error': False, 'result': '', 'structured_output': raw()}
+            return SimpleNamespace(returncode=0, stdout=json.dumps(out))
+
+        with mock.patch.dict('os.environ', {'ANTHROPIC_API_KEY': '', 'CLAUDE_CODE_OAUTH_TOKEN': 't'}):
+            items, _, counts = run(auto.CliClient('claude', runner))
+        cmd = seen['cmd']
+        self.assertEqual(cmd[cmd.index('--tools') + 1], '')
+        self.assertIn('--json-schema', cmd)
+        self.assertNotIn('ANTHROPIC_API_KEY', seen['env'])
+        self.assertIn('[p.2]', seen['input'])
+        self.assertEqual(counts['auto'], 1)
+        self.assertEqual(items[0]['eligibility']['state'], 'auto')
+
+    def test_subscription_cli_failure_or_missing_output_is_skipped(self):
+        for out, code in [({'is_error': True}, 0), ({'result': 'no schema'}, 0), ({}, 1)]:
+            runner = lambda cmd, **k: SimpleNamespace(returncode=code, stdout=json.dumps(out))
+            items, _, counts = run(auto.CliClient('claude', runner))
+            self.assertEqual(counts['auto'], 0)
+            self.assertFalse(items[0]['verified'])
+
 
 if __name__ == '__main__':
     unittest.main()

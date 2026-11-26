@@ -50,4 +50,9 @@ node --check app.js
 
 화면에는 'AI 공고문 분석' 표시와 분석일, 근거 문장, 원문 쪽 링크를 함께 보여 준다. 사람이 검토한 근거가 있으면 그것이 우선한다.
 
-설정: GitHub 저장소 Actions Secret에 `ANTHROPIC_API_KEY`를 등록한다. 키가 없으면 새 분석은 하지 않고 저장된 분석만 다시 적용한다.
+설정: GitHub 저장소 Actions Secret에 둘 중 하나를 등록한다. 둘 다 있으면 API 키를 쓴다. 둘 다 없으면 새 분석은 하지 않고 저장된 분석만 다시 적용한다.
+
+- `CLAUDE_CODE_OAUTH_TOKEN`: Claude Pro·Max 구독. PC 터미널에서 `claude setup-token`을 실행해 나온 토큰(1년 유효). 워크플로가 Claude Code CLI를 설치해 `claude -p`로 분석한다. 구독 사용 한도를 함께 쓴다.
+- `ANTHROPIC_API_KEY`: Anthropic Console에서 발급한 API 키. 사용량만큼 과금된다.
+
+Anthropic 안내에 따르면 구독 인증은 개인의 일반적인 Claude Code 사용을 위한 것이고, 다른 사람에게 제공하는 제품·서비스에는 API 키를 쓰도록 되어 있다([Legal and compliance](https://code.claude.com/docs/en/legal-and-compliance)). 개발·테스트 단계에서는 구독 토큰으로 돌리고, 공개 출시·유료화 전에는 API 키로 바꾼다.
