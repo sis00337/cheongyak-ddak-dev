@@ -866,6 +866,9 @@ button:focus-visible, [tabindex]:focus-visible, select:focus-visible, input:focu
   font-size: 11.5px; color: rgba(255, 255, 255, .62);
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
+.ib-actions { flex: none; display: flex; gap: 6px; }
+.ib-actions .ib-btn { white-space: nowrap; }
+.ib-btn--ghost { background: transparent !important; color: #fff !important; box-shadow: inset 0 0 0 1px rgba(255,255,255,.4); }
 .ib-btn {
   flex: none;
   font-size: 12.5px; font-weight: 800; color: #191f28;
@@ -1144,7 +1147,7 @@ button:focus-visible, [tabindex]:focus-visible, select:focus-visible, input:focu
   display: flex; align-items: center; justify-content: center;
   text-decoration: none;
 }
-.drawer-actions .btn-secondary { flex: 1; }
+.drawer-actions .btn-secondary { flex: 1; white-space: nowrap; padding-left: 8px; padding-right: 8px; }
 
 /* 드로어 상단 — 청약홈 신청 박스 */
 .d-apply { padding-top: 16px; }

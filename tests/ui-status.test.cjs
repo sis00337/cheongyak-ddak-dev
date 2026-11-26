@@ -110,3 +110,15 @@ test('stale data, mismatched snapshots, missing status are distinct', async () =
   const missing = await render(null);
   assert.match(missing.nodes.get('#syncStatus').textContent, /갱신 상태를 확인하지 못/);
 });
+
+test('no placeholder ad cards are rendered between listings', async () => {
+  const many = [1, 2, 3, 4].map(n => ({ ...original.listings[0], id: 'fixture-' + n, name: '테스트 공고 ' + n }));
+  const { nodes } = await render({ status: 'not_configured' }, {}, many);
+  assert.doesNotMatch(nodes.get('#cards').innerHTML, /ad-card|광고/);
+});
+
+test('drawer offers a calendar export for the listing', async () => {
+  const view = await render({ status: 'not_configured' });
+  view.openCard('fixture-1');
+  assert.match(view.nodes.get('#drawer').innerHTML, /id="drawerCal"/);
+});

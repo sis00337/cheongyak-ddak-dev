@@ -55,3 +55,40 @@ test('rejected head requirement and household count use explicit input only', ()
   assert.equal(evaluate(listing(checks), { ...profile, householder: '세대원' }, {}, now).checks[3].status, 'fail');
   assert.equal(evaluate(listing(checks), { ...profile, housing: '' }, {}, now).checks[0].status, 'unknown');
 });
+
+const { formatManwon, formatPriceRange, buildICS } = require('../app.js');
+
+test('man-won amounts read as 억/만', () => {
+  assert.equal(formatManwon(61345), '6억 1,345만 원');
+  assert.equal(formatManwon(85000), '8억 5,000만 원');
+  assert.equal(formatManwon(120000), '12억 원');
+  assert.equal(formatManwon(9500), '9,500만 원');
+  assert.equal(formatManwon(null), '');
+  assert.equal(formatPriceRange(61345, 85406), '6억 1,345만 원 ~ 8억 5,406만 원');
+  assert.equal(formatPriceRange(9500, 9500), '9,500만 원');
+});
+
+test('calendar export has all-day events for apply and winners dates', () => {
+  const ics = buildICS([{ id: 'x1', name: '테스트, 공고', applyStart: '2026-11-30', applyEnd: '2026-12-02',
+    winnersDate: '2026-12-09', detailUrl: 'https://www.applyhome.co.kr/' }], new Date('2026-11-26T00:00:00Z'));
+  assert.match(ics, /^BEGIN:VCALENDAR\r\n/);
+  assert.match(ics, /END:VCALENDAR\r\n$/);
+  assert.equal((ics.match(/BEGIN:VEVENT/g) || []).length, 3);
+  assert.match(ics, /DTSTART;VALUE=DATE:20261202\r\nDTEND;VALUE=DATE:20261203/);
+  assert.match(ics, /DTEND;VALUE=DATE:20261210/);
+  assert.match(ics, /테스트\\, 공고/);
+  assert.match(ics, /UID:x1-winners@cheongyak-ddak/);
+  for (const line of ics.split('\r\n')) assert.ok(Buffer.byteLength(line) <= 75, line);
+});
+
+test('calendar export skips listings without valid dates', () => {
+  const ics = buildICS([{ id: 'x2', name: '날짜 없음', applyStart: '', applyEnd: '공고문 확인' }]);
+  assert.equal((ics.match(/BEGIN:VEVENT/g) || []).length, 0);
+});
+
+test('calendar export leaves out dates already past in Korea', () => {
+  const ics = buildICS([{ id: 'x3', name: '진행 중', applyStart: '2026-11-23', applyEnd: '2026-11-27', winnersDate: '2026-12-03' }],
+    new Date('2026-11-26T00:00:00Z'));
+  assert.doesNotMatch(ics, /x3-start/);
+  assert.match(ics, /x3-end/);
+});

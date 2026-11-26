@@ -57,7 +57,76 @@
       ok: !fails.length && !missing.length, unknown: !fails.length && !!missing.length,
       reviewUsable: usable, reviewedCount: Object.keys(definitions).length };
   }
-  return { evaluate: evaluate, regions: regions };
+  /* 만 원 단위 금액을 "6억 1,345만 원"처럼 읽기 쉽게 바꾼다. */
+  function formatManwon(n) {
+    if (n == null || !isFinite(n)) return '';
+    n = Math.round(Number(n));
+    if (n <= 0) return '0원';
+    var eok = Math.floor(n / 10000), man = n % 10000;
+    var parts = [];
+    if (eok) parts.push(eok.toLocaleString('ko-KR') + '억');
+    if (man) parts.push(man.toLocaleString('ko-KR') + '만');
+    return parts.join(' ') + ' 원';
+  }
+  function formatPriceRange(min, max) {
+    if (min == null) return '';
+    if (max == null || max === min) return formatManwon(min);
+    return formatManwon(min) + ' ~ ' + formatManwon(max);
+  }
+
+  /* 관심 공고 일정을 iCalendar(.ics) 종일 일정으로 만든다. 아이폰·구글 캘린더에서 바로 열린다. */
+  function icsText(s) {
+    return String(s == null ? '' : s).replace(/\\/g, '\\\\').replace(/\r?\n/g, '\\n').replace(/([,;])/g, '\\$1');
+  }
+  function icsDate(iso) { return String(iso).replace(/-/g, ''); }
+  function nextDay(iso) {
+    var d = new Date(iso + 'T00:00:00Z');
+    d.setUTCDate(d.getUTCDate() + 1);
+    return d.toISOString().slice(0, 10).replace(/-/g, '');
+  }
+  function fold(line) {
+    /* RFC 5545: 75옥텟 이내로 접는다. 한글은 UTF-8 3바이트라 글자 수 기준 24자로 자른다. */
+    var out = [], cur = '', bytes = 0;
+    for (var i = 0; i < line.length; i++) {
+      var ch = line[i], b = ch.charCodeAt(0) < 0x80 ? 1 : 3;
+      if (bytes + b > 73) { out.push(cur); cur = ' '; bytes = 1; }
+      cur += ch; bytes += b;
+    }
+    out.push(cur);
+    return out.join('\r\n');
+  }
+  function buildICS(listings, now) {
+    now = now || new Date();
+    var stamp = now.toISOString().replace(/[-:]/g, '').replace(/\.\d+Z$/, 'Z');
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//cheongyak-ddak//ko', 'CALSCALE:GREGORIAN', 'METHOD:PUBLISH', 'X-WR-CALNAME:청약딱 관심 공고'];
+    var dateRe = /^\d{4}-\d{2}-\d{2}$/;
+    var today = new Date(now.getTime() + 9 * 3600000).toISOString().slice(0, 10); /* 지난 일정은 넣지 않는다 */
+    (listings || []).forEach(function (L) {
+      var events = [];
+      if (dateRe.test(L.applyStart || '')) events.push({ key: 'start', date: L.applyStart, title: '접수 시작' });
+      if (dateRe.test(L.applyEnd || '') && L.applyEnd !== L.applyStart) events.push({ key: 'end', date: L.applyEnd, title: '접수 마감' });
+      else if (dateRe.test(L.applyEnd || '') && !events.length) events.push({ key: 'end', date: L.applyEnd, title: '접수 마감' });
+      if (dateRe.test(L.winnersDate || '')) events.push({ key: 'winners', date: L.winnersDate, title: '당첨자 발표' });
+      events.filter(function (ev) { return ev.date >= today; }).forEach(function (ev) {
+        lines.push('BEGIN:VEVENT');
+        lines.push('UID:' + icsText(L.id) + '-' + ev.key + '@cheongyak-ddak');
+        lines.push('DTSTAMP:' + stamp);
+        lines.push('DTSTART;VALUE=DATE:' + icsDate(ev.date));
+        lines.push('DTEND;VALUE=DATE:' + nextDay(ev.date));
+        lines.push(fold('SUMMARY:[' + ev.title + '] ' + icsText(L.name)));
+        lines.push(fold('DESCRIPTION:' + icsText('청약딱에서 담은 공고입니다. 일정과 자격은 공고문 원문에서 확인하세요.')));
+        if (L.detailUrl) lines.push(fold('URL:' + L.detailUrl));
+        if (ev.key !== 'winners') {
+          lines.push('BEGIN:VALARM', 'ACTION:DISPLAY', 'DESCRIPTION:' + icsText(ev.title), 'TRIGGER:-PT15H', 'END:VALARM');
+        }
+        lines.push('END:VEVENT');
+      });
+    });
+    lines.push('END:VCALENDAR');
+    return lines.join('\r\n') + '\r\n';
+  }
+
+  return { evaluate: evaluate, regions: regions, formatManwon: formatManwon, formatPriceRange: formatPriceRange, buildICS: buildICS };
 });
 
 /* =========================================================
@@ -76,7 +145,8 @@
     { v: '2주택+', l: '2주택 이상' }
   ];
   /* 광역권을 묶으면 서로 다른 시도의 자격을 혼동할 수 있어 정확한 시도로 입력한다. */
-  var REGIONS = window.CheongyakEligibility.regions.map(function (r) { return { v: r, l: r, sidos: [r] }; });
+  var E = window.CheongyakEligibility;
+  var REGIONS = E.regions.map(function (r) { return { v: r, l: r, sidos: [r] }; });
   var HOUSEHOLDER = [
     { v: '세대주', l: '세대주' },
     { v: '세대원', l: '세대원' }
@@ -491,7 +561,7 @@
     if (row.conflict) chips += '<span class="chip chip-warn">발표일 중복</span>';
     if (!L.verified) chips += '<span class="chip chip-muted">원문 미확인</span>';
 
-    var price = L.priceMin == null ? '가격 미확인' : L.priceRange;
+    var price = L.priceMin == null ? '가격 미확인' : (E.formatPriceRange(L.priceMin, L.priceMax) || L.priceRange);
     var priceLabel = L.priceLabel || '분양가';
     var units = L.units == null ? '물량 미확인' : num(L.units) + '세대';
     var dep = L.requiredDeposit == null ? '확인 필요' : L.requiredDeposit > 0 ? num(L.requiredDeposit) + '만' : '없음';
@@ -543,18 +613,6 @@
       '</article>';
   }
 
-  function adCardHTML() {
-    return '' +
-      '<div class="ad-card">' +
-        '<div class="ad-card-body">' +
-          '<span class="ad-label">광고 · 제휴 슬롯 예시</span>' +
-          '<p class="ad-card-title">예치금이 모자랄 때 — 청약예치금·전세자금 대출 금리 비교</p>' +
-          '<p class="ad-card-copy">은행별 금리·한도를 한 번에 비교하고 이자 차이를 확인하세요</p>' +
-        '</div>' +
-        '<span class="ad-card-cta">비교하기</span>' +
-      '</div>';
-  }
-
   function renderResults() {
     var c = counts();
     var labels = { all: '전체 공고', eligible: '입력 조건 부합', excluded: '입력 조건 미달', unknown: '자격 확인 필요', fav: '관심 공고' };
@@ -580,9 +638,7 @@
     if (!rows.length) {
       host.innerHTML = emptyHTML();
     } else {
-      var chunks = rows.map(cardHTML);
-      if (chunks.length > 2) chunks.splice(2, 0, adCardHTML());
-      host.innerHTML = chunks.join('');
+      host.innerHTML = rows.map(cardHTML).join('');
     }
 
     renderOverlap();
@@ -677,7 +733,7 @@
     }
     return '<table class="d-table"><thead><tr><th>주택형</th><th>공급 금액(최고가)</th></tr></thead><tbody>' +
       L.types.map(function (t) {
-        return '<tr><td>' + esc(t.label) + '</td><td>' + esc(num(t.price)) + '만</td></tr>';
+        return '<tr><td>' + esc(t.label) + '</td><td>' + esc(E.formatManwon(t.price)) + '</td></tr>';
       }).join('') + '</tbody></table>';
   }
 
@@ -806,6 +862,7 @@
       '<div class="drawer-actions">' +
         '<button type="button" class="btn-secondary" id="drawerFav" aria-pressed="' + isFav + '">' +
           (isFav ? '관심 담김 ✓' : '관심 담기') + '</button>' +
+        '<button type="button" class="btn-secondary" id="drawerCal" aria-label="캘린더에 추가">캘린더</button>' +
         '<a class="btn-primary" href="' + esc(applyMeta(L, st, e.ok).url) + '" target="_blank" rel="noopener">' +
           esc(applyMeta(L, st, e.ok).short) + '</a>' +
       '</div>';
@@ -846,6 +903,22 @@
     save();
     renderResults();
     return state.favs.indexOf(id) !== -1;
+  }
+
+  /* ───────────────────────── 캘린더 ───────────────────────── */
+  function exportCalendar(list, filename) {
+    var withDates = list.filter(function (L) { return L.applyStart || L.applyEnd || L.winnersDate; });
+    if (!withDates.length) { toast('캘린더에 넣을 일정이 없어요'); return; }
+    var ics = E.buildICS(withDates);
+    var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(url); a.remove(); }, 1000);
+    toast('일정 파일을 열면 캘린더에 추가돼요');
   }
 
   /* ───────────────────────── 토스트 ───────────────────────── */
@@ -961,6 +1034,16 @@
         }
         return;
       }
+      if (ev.target.id === 'drawerCal') {
+        var cid = $('#drawer').getAttribute('data-id');
+        var one = byId(cid);
+        if (one) exportCalendar([one], 'cheongyak-' + cid + '.ics');
+        return;
+      }
+      if (ev.target.id === 'ibCal') {
+        exportCalendar(state.favs.map(byId).filter(Boolean), 'cheongyak-favorites.ics');
+        return;
+      }
       if (ev.target.id === 'ibBtn') {
         state.filter = 'fav';
         renderResults();
@@ -1021,6 +1104,14 @@
     setupMiniBar();
     bind();
     loadSyncStatus();
+    registerServiceWorker();
+  }
+
+  /* 오프라인에서도 마지막으로 본 공고를 열 수 있게 한다. 웹 푸시의 전제이기도 하다. */
+  function registerServiceWorker() {
+    if (typeof navigator === 'undefined' || !navigator.serviceWorker || typeof location === 'undefined') return;
+    if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
+    navigator.serviceWorker.register('sw.js').catch(function () {});
   }
 
   function renderSyncStatus(sync) {

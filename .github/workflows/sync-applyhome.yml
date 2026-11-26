@@ -50,14 +50,20 @@ jobs:
           git add data/listings.json data/sync-status.json
           if ! git diff --cached --quiet; then
             git commit -m 'chore: refresh official listings and sync status'
-            git push origin HEAD:main
+            # 실행 중에 다른 커밋이 main에 올라왔으면 그 위로 다시 쌓은 뒤 push한다.
+            pushed=0
+            for attempt in 1 2 3; do
+              if git pull --rebase origin main && git push origin HEAD:main; then pushed=1; break; fi
+              echo "push 재시도 ${attempt}"; sleep 5
+            done
+            if [ "$pushed" -ne 1 ]; then echo '::error::Data commit could not be pushed.'; exit 1; fi
           fi
       # GITHUB_TOKEN으로 만든 커밋은 Pages 빌드를 유발하지 않으므로 명시적으로 배포한다.
       # 실패 시에도 마지막 정상 공고와 갱신 실패 상태를 배포한다.
       - name: Prepare public site only
         run: |
           mkdir -p _site/data
-          cp index.html styles.css app.js manifest.webmanifest favicon.svg *.png _site/
+          cp index.html styles.css app.js sw.js manifest.webmanifest favicon.svg *.png _site/
           cp data/listings.json data/sync-status.json _site/data/
           touch _site/.nojekyll
       - uses: actions/configure-pages@v5
