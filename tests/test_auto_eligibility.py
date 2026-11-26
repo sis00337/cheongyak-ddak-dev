@@ -116,6 +116,20 @@ class AutoEligibilityTests(unittest.TestCase):
         finally:
             PAGES[1] = PAGES[1].rsplit('\n', 1)[0]
 
+    def test_tables_keep_column_headers_and_cells_are_verified(self):
+        from pathlib import Path
+        body = (Path(__file__).parent / 'fixtures' / 'table.pdf').read_bytes()
+        pages = auto.extract_pages(body)
+        self.assertIn('세대주 요건 | 기관추천: -, 다자녀: -, 신혼부부: -, 생애최초: 필요, 일반공급: -', pages[0])
+
+        def accepted(quote):
+            checks, _ = auto.verify({'checks': {'householder': {'kind': 'required', 'page': 1, 'quote': quote}}}, pages)
+            return 'householder' in checks
+
+        self.assertTrue(accepted('세대주 요건 | 생애최초: 필요'))
+        self.assertFalse(accepted('세대주 요건 | 일반공급: 필요'))
+        self.assertFalse(accepted('소득 기준 | 생애최초: 필요'))
+
     def test_cached_analysis_is_reused_without_calling_claude(self):
         _, cache, _ = run(FakeClient(raw()))
         client = FakeClient(raw())
