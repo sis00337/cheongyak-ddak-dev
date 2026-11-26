@@ -104,6 +104,32 @@ class AutoEligibilityTests(unittest.TestCase):
         self.assertNotIn('housing', checks)
         self.assertEqual(checks['residence']['page'], 2)
 
+    def test_table_fragment_is_not_accepted_as_evidence(self):
+        PAGES[1] += '\n세대주 요건 - - - 필요 - - - -'
+        try:
+            payload = raw()
+            payload['checks']['householder']['quote'] = '세대주 요건 - - - 필요 - - - -'
+            items, _, _ = run(FakeClient(payload))
+            self.assertNotIn('householder', items[0]['eligibility']['checks'])
+            self.assertFalse(auto.is_sentence('세대주 요건 - - - 필요 - - - -'))
+            self.assertTrue(auto.is_sentence('무주택세대구성원 중 세대주'))
+        finally:
+            PAGES[1] = PAGES[1].rsplit('\n', 1)[0]
+
+    def test_tables_keep_column_headers_and_cells_are_verified(self):
+        from pathlib import Path
+        body = (Path(__file__).parent / 'fixtures' / 'table.pdf').read_bytes()
+        pages = auto.extract_pages(body)
+        self.assertIn('세대주 요건 | 기관추천: -, 다자녀: -, 신혼부부: -, 생애최초: 필요, 일반공급: -', pages[0])
+
+        def accepted(quote):
+            checks, _ = auto.verify({'checks': {'householder': {'kind': 'required', 'page': 1, 'quote': quote}}}, pages)
+            return 'householder' in checks
+
+        self.assertTrue(accepted('세대주 요건 | 생애최초: 필요'))
+        self.assertFalse(accepted('세대주 요건 | 일반공급: 필요'))
+        self.assertFalse(accepted('소득 기준 | 생애최초: 필요'))
+
     def test_cached_analysis_is_reused_without_calling_claude(self):
         _, cache, _ = run(FakeClient(raw()))
         client = FakeClient(raw())

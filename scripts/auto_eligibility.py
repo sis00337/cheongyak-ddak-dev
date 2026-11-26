@@ -32,7 +32,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 KST = timezone(timedelta(hours=9))
 MODEL = 'claude-opus-5-5'
-PROMPT_VERSION = 1
+PROMPT_VERSION = 2
 MAX_CHARS = 90000
 MAX_NEW_PER_RUN = 15
 REGION_LIST = ['서울', '경기', '인천', '부산', '울산', '경남', '대구', '경북', '대전', '세종',
@@ -57,6 +57,8 @@ SYSTEM = """당신은 한국 아파트·오피스텔 청약 입주자모집공�
   amountWon은 "minimum"일 때만 의미가 있고, 그 밖에는 0을 넣으세요.
 - householder: 세대주만 신청 가능하면 "required", 세대원도 가능하면 "not_required".
 - quote: 판단 근거가 된 공고문 문장을 한 글자도 바꾸지 말고 그대로 짧게(15~80자) 옮기세요. 요약하거나 고치면 검증에서 탈락합니다.
+- 표는 각 쪽 끝 [표] 아래에 "행 제목 | 열 제목: 값" 꼴로 다시 적혀 있습니다. 표가 근거라면 그 줄에서 해당 칸("세대주 요건 | 생애최초: 필요" 등)을 그대로 옮기고, 열 제목을 보고 어느 공급 유형에 해당하는지 판단하세요. 1순위 일반공급에 해당하는 칸이 아니면 그 조건의 근거로 쓰지 마세요.
+- quote는 반드시 조건을 직접 말하는 문장이어야 합니다. 열 제목 없이 뭉개진 표 조각("세대주 요건 - - 필요 -")이나 다른 조건을 설명하는 문장은 근거가 아니니, 그런 것밖에 없으면 kind를 "unknown"으로 두세요.
 - page: quote가 있는 쪽 번호. 텍스트의 [p.N] 표시를 따릅니다.
 - kind가 "unknown"이면 page는 0, quote는 빈 문자열로 둡니다.
 - manualChecks: 위 네 조건 외에 신청 전에 꼭 확인해야 할 제한(재당첨 제한, 소득·자산 기준, 거주기간, 나이, 해외 체류, 중복 청약 제한 등)을
@@ -116,10 +118,42 @@ def find_pdf_url(detail_html, house_no, pblanc_no):
     return None
 
 
+def clean_cell(cell):
+    return ' '.join(str(cell or '').split()) or '-'
+
+
+def format_table(rows):
+    """표를 '행 제목 | 열 제목: 값' 꼴로 펴서, 어느 칸이 어느 유형인지 글로도 남게 한다."""
+    rows = [[clean_cell(c) for c in row] for row in rows if row and any(c for c in row)]
+    if len(rows) < 2 or max(len(r) for r in rows) < 2:
+        return ''
+    header = rows[0]
+    lines = []
+    for row in rows[1:]:
+        pairs = [f'{header[i] if i < len(header) else i + 1}: {cell}' for i, cell in enumerate(row[1:], start=1)]
+        lines.append(f'{row[0]} | ' + ', '.join(pairs))
+    return '\n'.join(lines)
+
+
+def page_tables(body):
+    """pdfplumber로 쪽마다 표를 뽑는다. 실패하면 빈 목록."""
+    try:
+        import pdfplumber
+        with pdfplumber.open(io.BytesIO(body)) as pdf:
+            return ['\n\n'.join(t for t in (format_table(rows) for rows in page.extract_tables()) if t)
+                    for page in pdf.pages]
+    except Exception:
+        return []
+
+
 def extract_pages(body):
     from pypdf import PdfReader
     reader = PdfReader(io.BytesIO(body))
-    return [(page.extract_text() or '') for page in reader.pages]
+    pages = [(page.extract_text() or '') for page in reader.pages]
+    tables = page_tables(body)
+    if len(tables) == len(pages):
+        pages = [text + ('\n\n[표]\n' + table if table else '') for text, table in zip(pages, tables)]
+    return pages
 
 
 def select_pages(pages, limit=MAX_CHARS):
@@ -188,14 +222,34 @@ class CliClient:
         return output if isinstance(output, dict) else None
 
 
+def is_sentence(quote):
+    """표 칸 조각(대시·빈칸 위주)은 근거 문장으로 인정하지 않는다."""
+    text = str(quote or '')
+    hangul = len(re.findall('[가-힣]', text))
+    dashes = len(re.findall(r'(?:^|\s)[-–—](?=\s|$)', text))
+    return hangul >= 8 and dashes < 2
+
+
 def verify(raw, pages):
     """근거 문장이 원문에 있는 조건만 남긴다. 쪽 번호가 틀리면 실제로 나온 쪽으로 고친다."""
     normalized = [normalize_text(p) for p in pages]
+
+    table_lines = [[(normalize_text(l.split(' | ', 1)[0]), normalize_text(l))
+                    for l in p.split('\n[표]\n', 1)[1].splitlines() if ' | ' in l] if '\n[표]\n' in p else []
+                   for p in pages]
+
+    def in_table(quote, page_index):
+        # "행 제목 | 열 제목: 값"은 같은 표 줄에 행 제목과 칸이 함께 있으면 인정한다.
+        row, cell = (normalize_text(x) for x in quote.split('|', 1))
+        return bool(row and cell) and any(r == row and cell in line for r, line in table_lines[page_index])
 
     def locate(quote, page):
         q = normalize_text(quote)
         if len(q) < 6:
             return None
+        if '|' in quote:
+            order = ([page - 1] if 1 <= page <= len(pages) else []) + list(range(len(pages)))
+            return next((i + 1 for i in order if in_table(quote, i)), None)
         if 1 <= page <= len(pages) and q in normalized[page - 1]:
             return page
         for i, text in enumerate(normalized):
@@ -206,6 +260,8 @@ def verify(raw, pages):
     checks = {}
     for key, check in (raw.get('checks') or {}).items():
         if not isinstance(check, dict) or check.get('kind') in (None, 'unknown'):
+            continue
+        if not is_sentence(check.get('quote')):
             continue
         page = locate(check.get('quote', ''), check.get('page', 0))
         if not page:
@@ -301,6 +357,8 @@ def run(listings, cache, fetcher, client, now, max_new=MAX_NEW_PER_RUN, log=prin
                           'analyzedAt': now.isoformat(timespec='seconds'), 'model': MODEL,
                           'promptVersion': PROMPT_VERSION, 'checks': checks, 'manualChecks': manual,
                           'summary': str(raw.get('summary') or '')[:300]}
+            # 예전 기준으로 저장된 분석에도 같은 근거 기준을 적용한다.
+            cached['checks'] = {k: v for k, v in cached['checks'].items() if is_sentence(v.get('quote'))}
             fresh[key] = cached
             if not cached['checks']:
                 counts['autoSkipped'] += 1
