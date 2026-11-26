@@ -104,6 +104,18 @@ class AutoEligibilityTests(unittest.TestCase):
         self.assertNotIn('housing', checks)
         self.assertEqual(checks['residence']['page'], 2)
 
+    def test_table_fragment_is_not_accepted_as_evidence(self):
+        PAGES[1] += '\n세대주 요건 - - - 필요 - - - -'
+        try:
+            payload = raw()
+            payload['checks']['householder']['quote'] = '세대주 요건 - - - 필요 - - - -'
+            items, _, _ = run(FakeClient(payload))
+            self.assertNotIn('householder', items[0]['eligibility']['checks'])
+            self.assertFalse(auto.is_sentence('세대주 요건 - - - 필요 - - - -'))
+            self.assertTrue(auto.is_sentence('무주택세대구성원 중 세대주'))
+        finally:
+            PAGES[1] = PAGES[1].rsplit('\n', 1)[0]
+
     def test_cached_analysis_is_reused_without_calling_claude(self):
         _, cache, _ = run(FakeClient(raw()))
         client = FakeClient(raw())

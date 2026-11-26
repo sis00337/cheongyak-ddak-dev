@@ -57,6 +57,7 @@ SYSTEM = """당신은 한국 아파트·오피스텔 청약 입주자모집공�
   amountWon은 "minimum"일 때만 의미가 있고, 그 밖에는 0을 넣으세요.
 - householder: 세대주만 신청 가능하면 "required", 세대원도 가능하면 "not_required".
 - quote: 판단 근거가 된 공고문 문장을 한 글자도 바꾸지 말고 그대로 짧게(15~80자) 옮기세요. 요약하거나 고치면 검증에서 탈락합니다.
+- quote는 반드시 조건을 직접 말하는 문장이어야 합니다. 표의 칸 조각("세대주 요건 - - 필요 -")이나 다른 조건을 설명하는 문장은 근거가 아니니, 그런 것밖에 없으면 kind를 "unknown"으로 두세요.
 - page: quote가 있는 쪽 번호. 텍스트의 [p.N] 표시를 따릅니다.
 - kind가 "unknown"이면 page는 0, quote는 빈 문자열로 둡니다.
 - manualChecks: 위 네 조건 외에 신청 전에 꼭 확인해야 할 제한(재당첨 제한, 소득·자산 기준, 거주기간, 나이, 해외 체류, 중복 청약 제한 등)을
@@ -188,6 +189,14 @@ class CliClient:
         return output if isinstance(output, dict) else None
 
 
+def is_sentence(quote):
+    """표 칸 조각(대시·빈칸 위주)은 근거 문장으로 인정하지 않는다."""
+    text = str(quote or '')
+    hangul = len(re.findall('[가-힣]', text))
+    dashes = len(re.findall(r'(?:^|\s)[-–—](?=\s|$)', text))
+    return hangul >= 8 and dashes < 2
+
+
 def verify(raw, pages):
     """근거 문장이 원문에 있는 조건만 남긴다. 쪽 번호가 틀리면 실제로 나온 쪽으로 고친다."""
     normalized = [normalize_text(p) for p in pages]
@@ -206,6 +215,8 @@ def verify(raw, pages):
     checks = {}
     for key, check in (raw.get('checks') or {}).items():
         if not isinstance(check, dict) or check.get('kind') in (None, 'unknown'):
+            continue
+        if not is_sentence(check.get('quote')):
             continue
         page = locate(check.get('quote', ''), check.get('page', 0))
         if not page:
@@ -301,6 +312,8 @@ def run(listings, cache, fetcher, client, now, max_new=MAX_NEW_PER_RUN, log=prin
                           'analyzedAt': now.isoformat(timespec='seconds'), 'model': MODEL,
                           'promptVersion': PROMPT_VERSION, 'checks': checks, 'manualChecks': manual,
                           'summary': str(raw.get('summary') or '')[:300]}
+            # 예전 기준으로 저장된 분석에도 같은 근거 기준을 적용한다.
+            cached['checks'] = {k: v for k, v in cached['checks'].items() if is_sentence(v.get('quote'))}
             fresh[key] = cached
             if not cached['checks']:
                 counts['autoSkipped'] += 1
