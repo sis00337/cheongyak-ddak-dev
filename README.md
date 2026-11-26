@@ -46,12 +46,14 @@ node --check app.js
 
 ## 파일 구성
 
-- index.html / styles.css / app.js: 조건 입력, 필터, 관심 저장, 발표일 중복 안내, 공고 상세.
+- index.html / styles.css / app.js: 조건 입력, 필터, 관심 저장, 발표일 중복 안내, 공고 상세, 관심 공고 캘린더(.ics) 내보내기.
+- sw.js: 네트워크 우선 서비스 워커. 오프라인일 때만 마지막으로 받은 공고를 보여 줍니다.
 - data/listings.json: 마지막 정상 공고 데이터.
 - data/sync-status.json: 자동 갱신 상태. 인증키는 포함하지 않습니다.
 - scripts/sync_applyhome.py: 공식 API 5종 목록과 주택형 데이터를 수집합니다.
 - tests/test_sync_applyhome.py: 수집 및 실패 보존 테스트.
 - scripts/eligibility_rules.py / data/eligibility-rules.json: 검토 원본 대조 및 항목별 자격 근거.
+- scripts/auto_eligibility.py / data/auto-eligibility.json: 공고문 PDF를 Claude로 자동 분석하고 근거 문장을 원문과 대조. Secret `CLAUDE_CODE_OAUTH_TOKEN`(구독) 또는 `ANTHROPIC_API_KEY` 필요. [설명](docs/eligibility.md#공고문-자동-분석-ai)
 - tests/test_eligibility_rules.py / tests/eligibility.test.cjs: 원본 변경과 만료, 미입력, 경계값, 조건별 판정 테스트.
 - .github/workflows/sync-applyhome.yml: 정기 실행, 데이터 커밋, Pages 배포.
 - docs/data-sync.md: 출처, 제공 범위, 이용 조건 확인, 설정 절차와 제한.
@@ -61,4 +63,4 @@ node --check app.js
 - 실제 인증키로 데이터 연동과 배포를 검증하고 운영계정 승인·트래픽 조건을 확인합니다.
 - 공고문 검토 범위를 확대합니다. 현재 3건의 일부 입력 조건을 검토했으며 전체 자격 검증이 아닙니다.
 - 알림, iOS 앱 전환, 개인정보 안내, 수익화는 후속 작업입니다.
-- 광고 영역은 예시이며 실제 광고가 연결되어 있지 않습니다.
+- 광고 예시 영역은 제거했습니다. 실제 광고는 자체 도메인과 트래픽 확보 후 연결합니다.

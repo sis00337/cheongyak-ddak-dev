@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#ffffff">
-<title>청약딱 — 내 조건 맞춤 청약 필터</title>
+<title>청약딱 — 청약 공고·일정 한눈에</title>
 <meta name="description" content="전국 청약 공고와 일정을 한눈에 보고, 공고문에서 확인한 조건과 입력 정보를 비교합니다. 추가 확인할 사항과 근거를 함께 제공합니다.">
 <meta name="application-name" content="청약딱">
 <meta name="apple-mobile-web-app-title" content="청약딱">
@@ -22,16 +22,16 @@
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="청약딱">
 <meta property="og:locale" content="ko_KR">
-<meta property="og:title" content="청약딱 — 내 조건에 맞는 청약만 딱 골라드려요">
+<meta property="og:title" content="청약딱 — 청약 공고와 일정을 한눈에">
 <meta property="og:description" content="청약 공고와 일정을 한눈에 보고 공고문에서 확인한 조건, 입력 정보, 추가 확인 사항을 함께 살펴보세요.">
 <meta property="og:url" content="https://sis00337.github.io/cheongyak-ddak-dev/">
 <meta property="og:image" content="https://sis00337.github.io/cheongyak-ddak-dev/og-image.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="청약딱 — 내 조건에 맞는 청약만 딱 골라드려요">
+<meta property="og:image:alt" content="청약딱 — 청약 공고와 일정을 한눈에">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="청약딱 — 내 조건에 맞는 청약만 딱 골라드려요">
+<meta name="twitter:title" content="청약딱 — 청약 공고와 일정을 한눈에">
 <meta name="twitter:description" content="전국 청약 공고와 일정, 공고문 근거와 추가 확인 사항을 한눈에.">
 <meta name="twitter:image" content="https://sis00337.github.io/cheongyak-ddak-dev/og-image.png">
 <link rel="stylesheet" href="styles.css">
@@ -66,16 +66,16 @@
 
   <section class="hero">
     <p class="eyebrow"><span class="eyebrow-dot"></span>전국 청약홈 공고를 매일 정리해요</p>
-    <h1>내 조건에 맞는 청약만<br>딱 골라드려요</h1>
+    <h1>전국 청약 공고와 일정을<br>한눈에 정리해 드려요</h1>
     <p class="hero-sub">
       무주택·유주택, 사는 지역, 청약통장 예치금까지 반영해서
       <b>입력 조건에 맞는 공고</b>와 <b>추가 확인할 사항</b>을 같이 보여드려요.
       서울부터 제주까지, 전국 17개 시도 공고를 한 화면에서.
     </p>
     <ul class="hero-points">
-      <li><span class="hp-ico">⚡</span>3초 입력</li>
-      <li><span class="hp-ico">🚫</span>탈락 사유</li>
-      <li><span class="hp-ico">🗓️</span>발표일 중복</li>
+      <li><span class="hp-ico">🗓️</span>캘린더 추가</li>
+      <li><span class="hp-ico">📄</span>공고문 근거</li>
+      <li><span class="hp-ico">🔔</span>발표일 중복</li>
     </ul>
   </section>
 
@@ -129,22 +129,10 @@
           기본값으로 자격을 판단하지 않습니다. <b>각 공고일 당시</b> 정보를 입력하고, 통장 종류·납입 기간·예치 기준은 원문에서 확인하세요.
         </p>
       </section>
-
-      <aside class="side-ad" aria-label="광고 영역 예시">
-        <span class="ad-label">광고 · 제휴 슬롯 예시</span>
-        <p class="side-ad-title">예치금이 부족할 때</p>
-        <p class="side-ad-copy">은행별 청약예금·주택담보대출 금리를 한 번에 비교</p>
-        <span class="side-ad-cta">금리 비교하기 →</span>
-        <span class="side-ad-size">300×250 AdSense / 제휴 배너 자리</span>
-      </aside>
     </div>
 
     <!-- ─────────── 결과 ─────────── -->
     <div class="results-col">
-      <div class="ad-leaderboard ad-leaderboard--top" aria-label="광고 영역 예시">
-        <span class="ad-label">광고 · AdSense 슬롯 예시</span>
-        <span class="ad-box">728 × 90 · 반응형 광고가 들어갈 자리</span>
-      </div>
 
       <div class="results-head">
         <div class="results-title">
@@ -170,11 +158,6 @@
 
       <div id="cards" class="cards"></div>
 
-      <div class="ad-leaderboard" aria-label="광고 영역 예시">
-        <span class="ad-label">광고 · AdSense 슬롯 예시</span>
-        <span class="ad-box">728 × 90 · 반응형 광고가 들어갈 자리</span>
-      </div>
-
       <section class="notice">
         <h3>이 앱이 보는 것</h3>
         <ul>
@@ -187,8 +170,8 @@
         <p class="notice-note" id="dataSourceNote">
           공고 데이터: 청약홈(applyhome.co.kr) 입주자모집공고 · <b>2026-11-25 수집 · 전국 17개 시도</b> ·
           APT 분양정보 + APT 잔여세대(무순위·임의공급·불법행위재공급) + 오피스텔·민간임대.
-          자격·거주지·예치금 판정은 첨부된 공고문의 신청자격 문구를 그대로 옮긴 것이며,
-          원문을 확인하지 못한 공고는 카드에 <b>원문 미확인</b>으로 표시합니다.
+          조건별 비교는 공고문 원문을 검토한 일부 공고에만 적용되며,
+          검토하지 않은 공고는 카드에 <b>원문 미확인</b>으로 표시합니다.
         </p>
       </section>
 
@@ -213,7 +196,10 @@
         <span id="ibSub">발표일이 겹치는지 확인해 드려요</span>
       </div>
     </div>
-    <button class="ib-btn" id="ibBtn" type="button">확인하기</button>
+    <div class="ib-actions">
+      <button class="ib-btn ib-btn--ghost" id="ibCal" type="button">캘린더에 추가</button>
+      <button class="ib-btn" id="ibBtn" type="button">확인하기</button>
+    </div>
   </div>
 </div>
 
