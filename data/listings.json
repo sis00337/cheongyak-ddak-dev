@@ -3,7 +3,7 @@
   "source": "한국부동산원 청약홈 분양정보 조회 서비스",
   "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
   "collectedAt": "2026-11-27",
-  "updatedAt": "2026-11-27T10:32:12+09:00",
+  "updatedAt": "2026-11-27T17:58:08+09:00",
   "count": 27,
   "scope": "전국 · APT / 무순위·잔여세대 / 오피스텔·기타 / 공공지원민간임대 / 임의공급",
   "unit": "금액 단위: 만 원",
@@ -16,19 +16,13 @@
   },
   "eligibilityCounts": {
    "reviewed": 1,
-   "needsReview": 9,
-   "auto": 17,
-   "autoSkipped": 9
+   "needsReview": 3,
+   "auto": 23,
+   "autoSkipped": 3
   },
   "unverified": [
    "ah2026820015",
    "ah2026910289",
-   "ah2026000596",
-   "ah2026000597",
-   "ah2026000598",
-   "ah2026930047",
-   "ah2026950089",
-   "ah2026000568",
    "ah2026000611"
   ]
  },
@@ -172,7 +166,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000505&pblancNo=2026000505&atchmnflSeqNo=2012203&atchmnflSn=4",
@@ -316,7 +310,7 @@
    "sourceEndpoint": "getPblPvtRentLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026850057&pblancNo=2026850057&atchmnflSeqNo=2021998&atchmnflSn=5",
@@ -519,7 +513,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910294&pblancNo=2026910294&atchmnflSeqNo=2031995&atchmnflSn=3",
@@ -659,7 +653,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910303&pblancNo=2026910303&atchmnflSeqNo=2027407&atchmnflSn=6",
@@ -791,7 +785,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "reviewed",
-    "checkedAt": "2026-11-27T10:32:12+09:00",
+    "checkedAt": "2026-11-27T17:58:08+09:00",
     "reviewedAt": "2026-11-25",
     "validUntil": "2026-12-25",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910304&pblancNo=2026910304&atchmnflSeqNo=2027367&atchmnflSn=2",
@@ -908,7 +902,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910305&pblancNo=2026910305&atchmnflSeqNo=2023020&atchmnflSn=4",
@@ -1030,7 +1024,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026930048&pblancNo=2026930048&atchmnflSeqNo=2027422&atchmnflSn=3",
@@ -1152,7 +1146,7 @@
    "sourceEndpoint": "getPblPvtRentLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026850058&pblancNo=2026850058&atchmnflSeqNo=2027434&atchmnflSn=1",
@@ -1270,7 +1264,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910301&pblancNo=2026910301&atchmnflSeqNo=2022069&atchmnflSn=2",
@@ -1396,7 +1390,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910302&pblancNo=2026910302&atchmnflSeqNo=2022219&atchmnflSn=3",
@@ -1532,7 +1526,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910311&pblancNo=2026910311&atchmnflSeqNo=2031992&atchmnflSn=6",
@@ -1700,7 +1694,7 @@
    "sourceEndpoint": "getUrbtyOfctlLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950099&pblancNo=2026950099&atchmnflSeqNo=2038048&atchmnflSn=4",
@@ -1840,7 +1834,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000510&pblancNo=2026000510&atchmnflSeqNo=2028139&atchmnflSn=4",
@@ -1966,7 +1960,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000521&pblancNo=2026000521&atchmnflSeqNo=2028167&atchmnflSn=2",
@@ -2093,7 +2087,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000575&pblancNo=2026000575&atchmnflSeqNo=2027378&atchmnflSn=2",
@@ -2215,7 +2209,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000585&pblancNo=2026000585&atchmnflSeqNo=2021027&atchmnflSn=5",
@@ -2361,7 +2355,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000590&pblancNo=2026000590&atchmnflSeqNo=2016073&atchmnflSn=3",
@@ -2498,7 +2492,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-27T10:33:52+09:00",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000591&pblancNo=2026000591&atchmnflSeqNo=2027261&atchmnflSn=5",
@@ -2571,16 +2565,22 @@
    "supplyType": "APT",
    "housingRequirement": "확인 필요",
    "requiredDeposit": null,
-   "depositNote": "공고문에서 예치금·납입 요건 확인 필요",
-   "residenceRequirement": "확인 필요",
-   "eligibleRegions": [],
+   "depositNote": "지역·면적별 예치금 기준 적용 (거주지와 가장 작은 주택형으로 계산)",
+   "residenceRequirement": "전북",
+   "eligibleRegions": [
+    "전북"
+   ],
    "priorityRegions": [],
-   "householderOnly": null,
-   "verified": false,
-   "eligibilityStatus": "needs_review",
+   "householderOnly": false,
+   "verified": true,
+   "eligibilityStatus": "auto_review",
    "evidence": {},
    "extraRequirements": [
-    "신청 자격은 공고문에서 확인해야 합니다"
+    "재당첨제한 10년: 분양가상한제 적용 주택이라 당첨되면 당첨일로부터 10년간 재당첨제한을 받습니다. 기존 재당첨제한 기간 중인 사람도 이 주택에는 청약할 수 있습니다.",
+    "2·3블록 중복청약 금지: 같은 날 공급하는 2블록 국민주택, 3블록 국민주택과 함께 청약하면 부적격 처리되므로 하나만 신청해야 합니다.",
+    "해외 체류 제한: 해외에 계속 90일을 넘게 머문 경우 국내 거주로 인정되지 않아 해당지역은 물론 기타지역으로도 청약할 수 없습니다.",
+    "부적격 당첨 제한기간: 과거 부적격 당첨으로 입주자 선정이 제한된 기간(당첨일로부터 6개월) 안에 있으면 신청할 수 없습니다.",
+    "고창군 거주자 우선: 경쟁이 생기면 공고일 현재 고창군 거주자가 전북 내 다른 지역 거주자보다 우선해서 당첨됩니다."
    ],
    "priceLabel": "공급금액(주택형별 최고금액)",
    "priceMin": 55870,
@@ -2616,9 +2616,63 @@
    "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
-    "state": "needs_review",
-    "reason": "공고문 항목별 검토 전입니다."
-   }
+    "state": "auto",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
+    "reviewedAt": "2026-11-27",
+    "validUntil": "2026-12-02",
+    "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000596&pblancNo=2026000596&atchmnflSeqNo=2027352&atchmnflSn=3",
+    "sourceSha256": "acbd9c0bdd031a3242172f7ff96d2faaa28f5c88ab8b3d85f99b1bd117c5215d",
+    "checks": {
+     "residence": {
+      "kind": "regions",
+      "page": 23,
+      "quote": "입주자모집공고일 현재 고창군에 거주하거나 전북특별자치도에 거주하는 만19세 이상인 분",
+      "values": [
+       "전북"
+      ]
+     },
+     "deposit": {
+      "kind": "standard_table",
+      "page": 23,
+      "quote": "주택청약종합저축 : 주택청약종합저축에 가입하여 6개월이 경과하고, 지역별·면적별 예치금액 이상인 분"
+     },
+     "householder": {
+      "kind": "not_required",
+      "page": 23,
+      "quote": "만19세 이상인 분 또는 세대주인 미성년자(자녀양육, 형제자매부양)"
+     }
+    },
+    "manualChecks": [
+     {
+      "label": "재당첨제한 10년",
+      "note": "분양가상한제 적용 주택이라 당첨되면 당첨일로부터 10년간 재당첨제한을 받습니다. 기존 재당첨제한 기간 중인 사람도 이 주택에는 청약할 수 있습니다.",
+      "page": 6
+     },
+     {
+      "label": "2·3블록 중복청약 금지",
+      "note": "같은 날 공급하는 2블록 국민주택, 3블록 국민주택과 함께 청약하면 부적격 처리되므로 하나만 신청해야 합니다.",
+      "page": 1
+     },
+     {
+      "label": "해외 체류 제한",
+      "note": "해외에 계속 90일을 넘게 머문 경우 국내 거주로 인정되지 않아 해당지역은 물론 기타지역으로도 청약할 수 없습니다.",
+      "page": 5
+     },
+     {
+      "label": "부적격 당첨 제한기간",
+      "note": "과거 부적격 당첨으로 입주자 선정이 제한된 기간(당첨일로부터 6개월) 안에 있으면 신청할 수 없습니다.",
+      "page": 24
+     },
+     {
+      "label": "고창군 거주자 우선",
+      "note": "경쟁이 생기면 공고일 현재 고창군 거주자가 전북 내 다른 지역 거주자보다 우선해서 당첨됩니다.",
+      "page": 6
+     }
+    ],
+    "analyzedAt": "2026-11-27T17:59:40+09:00",
+    "summary": "고창 데시앙 2블록 민영주택(전용 104·125㎡) 1순위는 공고일(2026.11.20) 현재 전북특별자치도에 사는 만 19세 이상이면 세대원도 신청할 수 있습니다. 청약통장은 가입 6개월이 지나고 지역별·면적별 예치금액 이상을 넣어 두어야 하며, 고창군 거주자가 우선이고 당첨자는 100% 추첨으로 뽑습니다. 1순위에 주택 소유 제한이 있는지는 공고문에 명확히 적혀 있지 않아 확정할 수 없습니다."
+   },
+   "pdfUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000596&pblancNo=2026000596&atchmnflSeqNo=2027352&atchmnflSn=3"
   },
   {
    "id": "ah2026000597",
@@ -2632,18 +2686,24 @@
    "district": "전북특별자치도 고창군 덕산지구 도시개발구역 내 공동주택 BL3",
    "address": "전북특별자치도 고창군 덕산지구 도시개발구역 내 공동주택 BL3",
    "supplyType": "APT",
-   "housingRequirement": "확인 필요",
+   "housingRequirement": "무주택 전용",
    "requiredDeposit": null,
    "depositNote": "공고문에서 예치금·납입 요건 확인 필요",
-   "residenceRequirement": "확인 필요",
-   "eligibleRegions": [],
+   "residenceRequirement": "전북",
+   "eligibleRegions": [
+    "전북"
+   ],
    "priorityRegions": [],
-   "householderOnly": null,
-   "verified": false,
-   "eligibilityStatus": "needs_review",
+   "householderOnly": false,
+   "verified": true,
+   "eligibilityStatus": "auto_review",
    "evidence": {},
    "extraRequirements": [
-    "신청 자격은 공고문에서 확인해야 합니다"
+    "청약통장 1순위 요건: 일반공급 1순위는 입주자저축에 가입한 지 6개월이 지나고, 매월 약정납입일에 월 납입금을 6회 이상 납입해야 합니다.",
+    "재당첨 제한: 재당첨제한 적용주택에 이미 당첨되어 제한 기간 안에 있는 사람과 그 세대원, 부적격 당첨 후 6개월이 지나지 않은 사람은 신청할 수 없습니다.",
+    "해외 체류: 공고일 기준으로 해외에 계속 90일을 넘게 체류한 사람은 해당지역 거주자로도, 기타지역 거주자로도 청약할 수 없습니다.",
+    "중복 청약 제한: 같은 날 공급하는 2블록과 3블록에 중복으로 청약하면 부적격이며, 세대 안에서는 부부를 제외하고 1명만 신청할 수 있습니다.",
+    "지역 우선공급: 공고일 현재 고창군 거주자에게 물량을 100% 우선 배정하고, 남는 물량만 고창군 외 전북특별자치도 거주자에게 공급합니다."
    ],
    "priceLabel": "공급금액(주택형별 최고금액)",
    "priceMin": 42910,
@@ -2683,9 +2743,63 @@
    "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
-    "state": "needs_review",
-    "reason": "공고문 항목별 검토 전입니다."
-   }
+    "state": "auto",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
+    "reviewedAt": "2026-11-27",
+    "validUntil": "2026-12-02",
+    "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000597&pblancNo=2026000597&atchmnflSeqNo=2028178&atchmnflSn=4",
+    "sourceSha256": "a852ca151875594ced5032b6f88de037fc54e4ec2821e357203c40c64a9608ac",
+    "checks": {
+     "housing": {
+      "kind": "none",
+      "page": 18,
+      "quote": "공급신청 자격자 : 성년자인 무주택세대구성원(외국인 제외)"
+     },
+     "residence": {
+      "kind": "regions",
+      "page": 1,
+      "quote": "고창군 외 전북특별자치도 거주자",
+      "values": [
+       "전북"
+      ]
+     },
+     "householder": {
+      "kind": "not_required",
+      "page": 4,
+      "quote": "일반공급: 해당 없음, -: 해당 없음, -: 해당 없음"
+     }
+    },
+    "manualChecks": [
+     {
+      "label": "청약통장 1순위 요건",
+      "note": "일반공급 1순위는 입주자저축에 가입한 지 6개월이 지나고, 매월 약정납입일에 월 납입금을 6회 이상 납입해야 합니다.",
+      "page": 47
+     },
+     {
+      "label": "재당첨 제한",
+      "note": "재당첨제한 적용주택에 이미 당첨되어 제한 기간 안에 있는 사람과 그 세대원, 부적격 당첨 후 6개월이 지나지 않은 사람은 신청할 수 없습니다.",
+      "page": 49
+     },
+     {
+      "label": "해외 체류",
+      "note": "공고일 기준으로 해외에 계속 90일을 넘게 체류한 사람은 해당지역 거주자로도, 기타지역 거주자로도 청약할 수 없습니다.",
+      "page": 3
+     },
+     {
+      "label": "중복 청약 제한",
+      "note": "같은 날 공급하는 2블록과 3블록에 중복으로 청약하면 부적격이며, 세대 안에서는 부부를 제외하고 1명만 신청할 수 있습니다.",
+      "page": 1
+     },
+     {
+      "label": "지역 우선공급",
+      "note": "공고일 현재 고창군 거주자에게 물량을 100% 우선 배정하고, 남는 물량만 고창군 외 전북특별자치도 거주자에게 공급합니다.",
+      "page": 18
+     }
+    ],
+    "analyzedAt": "2026-11-27T17:59:40+09:00",
+    "summary": "공고일(2026.11.20) 현재 전북특별자치도에 사는 성년 무주택세대구성원이면 세대주가 아니어도 일반공급에 신청할 수 있습니다. 고창군 거주자가 우선입니다. 국민주택이라 청약통장은 예치금이 아니라 가입 6개월·납입 6회 이상이 1순위 기준이며, 필요한 납입금액은 공고문에서 확정할 수 없습니다."
+   },
+   "pdfUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000597&pblancNo=2026000597&atchmnflSeqNo=2028178&atchmnflSn=4"
   },
   {
    "id": "ah2026000598",
@@ -2699,18 +2813,24 @@
    "district": "전북특별자치도 고창군 덕산지구 도시개발구역 내 공동주택 BL2",
    "address": "전북특별자치도 고창군 덕산지구 도시개발구역 내 공동주택 BL2",
    "supplyType": "APT",
-   "housingRequirement": "확인 필요",
+   "housingRequirement": "무주택 전용",
    "requiredDeposit": null,
    "depositNote": "공고문에서 예치금·납입 요건 확인 필요",
-   "residenceRequirement": "확인 필요",
-   "eligibleRegions": [],
+   "residenceRequirement": "전북",
+   "eligibleRegions": [
+    "전북"
+   ],
    "priorityRegions": [],
    "householderOnly": null,
-   "verified": false,
-   "eligibilityStatus": "needs_review",
+   "verified": true,
+   "eligibilityStatus": "auto_review",
    "evidence": {},
    "extraRequirements": [
-    "신청 자격은 공고문에서 확인해야 합니다"
+    "재당첨 제한: 분양가상한제 적용주택 등에 당첨돼 재당첨 제한 기간에 있는 본인과 그 세대원, 부적격 당첨일로부터 6개월이 지나지 않은 사람은 신청할 수 없습니다.",
+    "해외 체류: 공고일 현재 해외에 계속 90일을 넘게 머물고 있으면 해당지역(고창군)으로도, 기타지역(전북) 거주자로도 청약할 수 없습니다.",
+    "세대 내 중복 청약: 당첨자 발표일이 같은 주택에는 한 세대의 무주택세대구성원 중 1명만 신청할 수 있으며(부부는 예외), 2명 이상이 청약해 한 곳이라도 당첨되면 모두 부적격 처리됩니다.",
+    "2·3블록 중복 청약: 같은 날 공급하는 고창 데시앙 3블록과 중복으로 청약하면 부적격 처리됩니다.",
+    "무주택 유지: 일반공급 당첨자는 입주자모집공고일부터 입주할 때까지 무주택세대구성원 자격을 유지해야 합니다."
    ],
    "priceLabel": "공급금액(주택형별 최고금액)",
    "priceMin": 42440,
@@ -2746,9 +2866,58 @@
    "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
-    "state": "needs_review",
-    "reason": "공고문 항목별 검토 전입니다."
-   }
+    "state": "auto",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
+    "reviewedAt": "2026-11-27",
+    "validUntil": "2026-12-02",
+    "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000598&pblancNo=2026000598&atchmnflSeqNo=2027349&atchmnflSn=3",
+    "sourceSha256": "b21effd56e8405d25b2eb83d233b772f400772d9891efcad6a4b879e6909c48a",
+    "checks": {
+     "housing": {
+      "kind": "none",
+      "page": 19,
+      "quote": "■ 공급신청 자격자 : 성년자인 무주택세대구성원(외국인 제외)"
+     },
+     "residence": {
+      "kind": "regions",
+      "page": 3,
+      "quote": "입주자모집공고일 현재 고창군에 거주하거나 전북특별자치도 지역에 거주",
+      "values": [
+       "전북"
+      ]
+     }
+    },
+    "manualChecks": [
+     {
+      "label": "재당첨 제한",
+      "note": "분양가상한제 적용주택 등에 당첨돼 재당첨 제한 기간에 있는 본인과 그 세대원, 부적격 당첨일로부터 6개월이 지나지 않은 사람은 신청할 수 없습니다.",
+      "page": 49
+     },
+     {
+      "label": "해외 체류",
+      "note": "공고일 현재 해외에 계속 90일을 넘게 머물고 있으면 해당지역(고창군)으로도, 기타지역(전북) 거주자로도 청약할 수 없습니다.",
+      "page": 3
+     },
+     {
+      "label": "세대 내 중복 청약",
+      "note": "당첨자 발표일이 같은 주택에는 한 세대의 무주택세대구성원 중 1명만 신청할 수 있으며(부부는 예외), 2명 이상이 청약해 한 곳이라도 당첨되면 모두 부적격 처리됩니다.",
+      "page": 10
+     },
+     {
+      "label": "2·3블록 중복 청약",
+      "note": "같은 날 공급하는 고창 데시앙 3블록과 중복으로 청약하면 부적격 처리됩니다.",
+      "page": 1
+     },
+     {
+      "label": "무주택 유지",
+      "note": "일반공급 당첨자는 입주자모집공고일부터 입주할 때까지 무주택세대구성원 자격을 유지해야 합니다.",
+      "page": 20
+     }
+    ],
+    "analyzedAt": "2026-11-27T17:59:40+09:00",
+    "summary": "고창 데시앙 2블록 국민주택(전용 84㎡)의 일반공급 1순위 기준으로 정리했습니다. 공고일(2026.11.20) 현재 고창군이나 전북특별자치도에 사는 성년 무주택세대구성원이 신청할 수 있으며, 고창군 거주자에게 우선 공급합니다. 청약통장은 6개월 이상 가입하고 6회 이상 납입해야 하지만 금액 기준이 아니어서 예치금 항목은 '확인 불가'로 두었습니다. 표에는 일반공급 세대주 요건이 '해당 없음'으로 나오지만, 근거 문장을 정확히 인용할 수 없어 세대주 여부도 '확인 불가'로 두었습니다."
+   },
+   "pdfUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000598&pblancNo=2026000598&atchmnflSeqNo=2027349&atchmnflSn=3"
   },
   {
    "id": "ah2026930047",
@@ -2762,18 +2931,24 @@
    "district": "서울특별시 동대문구 청량리동 199번지 일원",
    "address": "서울특별시 동대문구 청량리동 199번지 일원",
    "supplyType": "불법행위재공급",
-   "housingRequirement": "확인 필요",
-   "requiredDeposit": null,
-   "depositNote": "공고문에서 예치금·납입 요건 확인 필요",
-   "residenceRequirement": "확인 필요",
-   "eligibleRegions": [],
+   "housingRequirement": "무주택 전용",
+   "requiredDeposit": 0,
+   "depositNote": "공고문에서 청약통장 불필요 확인",
+   "residenceRequirement": "서울",
+   "eligibleRegions": [
+    "서울"
+   ],
    "priorityRegions": [],
-   "householderOnly": null,
-   "verified": false,
-   "eligibilityStatus": "needs_review",
+   "householderOnly": true,
+   "verified": true,
+   "eligibilityStatus": "auto_review",
    "evidence": {},
    "extraRequirements": [
-    "신청 자격은 공고문에서 확인해야 합니다"
+    "재당첨 제한: 투기과열지구 주택이라 당첨되면 10년 재당첨 제한을 받습니다. 이미 다른 당첨으로 재당첨 제한 기간 중인 본인과 배우자는 청약할 수 없습니다.",
+    "나이 요건: 만 19세 이상이어야 합니다. 미성년자는 자녀를 키우거나 형제자매를 부양하는 세대주인 경우만 신청할 수 있고, 외국인은 신청할 수 없습니다.",
+    "해외 체류: 해외에 90일을 넘겨 계속 머문 장기해외체류자는 국내 거주로 인정되지 않아 청약할 수 없습니다.",
+    "중복 청약 제한: 당첨자 발표일이 같은 모든 주택(APT, 불법행위재공급, 규제지역 무순위)을 통틀어 1인 1건만 신청할 수 있고, 2건 이상 신청하면 모두 무효나 부적격 처리될 수 있습니다.",
+    "당첨 후 1순위 제한: 당첨되면 계약하지 않아도 당첨자로 관리되고, 당첨자와 그 세대원은 5년간 투기과열지구·청약과열지역 주택의 1순위 청약이 제한됩니다."
    ],
    "priceLabel": "공급금액(주택형별 최고금액)",
    "priceMin": 82383,
@@ -2801,9 +2976,68 @@
    "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
-    "state": "needs_review",
-    "reason": "공고문 항목별 검토 전입니다."
-   }
+    "state": "auto",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
+    "reviewedAt": "2026-11-27",
+    "validUntil": "2026-12-02",
+    "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026930047&pblancNo=2026930047&atchmnflSeqNo=2027014&atchmnflSn=3",
+    "sourceSha256": "7bf8c9d2bea1481835f31747746f4c18a5fa51285c177800e10120e78db7f43b",
+    "checks": {
+     "housing": {
+      "kind": "none",
+      "page": 6,
+      "quote": "입주자모집공고일 현재 해당 주택건설지역인 서울특별시에 거주하는 무주택세대주(무주택세대의 세대주)"
+     },
+     "residence": {
+      "kind": "regions",
+      "page": 6,
+      "quote": "입주자모집공고일 현재 해당 주택건설지역인 서울특별시에 거주하는 무주택세대주(무주택세대의 세대주)",
+      "values": [
+       "서울"
+      ]
+     },
+     "deposit": {
+      "kind": "not_required",
+      "page": 2,
+      "quote": "본 입주자모집공고는 청약통장 가입여부와 관계없이 청약신청 가능합니다."
+     },
+     "householder": {
+      "kind": "required",
+      "page": 6,
+      "quote": "입주자모집공고일 현재 해당 주택건설지역인 서울특별시에 거주하는 무주택세대주(무주택세대의 세대주)"
+     }
+    },
+    "manualChecks": [
+     {
+      "label": "재당첨 제한",
+      "note": "투기과열지구 주택이라 당첨되면 10년 재당첨 제한을 받습니다. 이미 다른 당첨으로 재당첨 제한 기간 중인 본인과 배우자는 청약할 수 없습니다.",
+      "page": 4
+     },
+     {
+      "label": "나이 요건",
+      "note": "만 19세 이상이어야 합니다. 미성년자는 자녀를 키우거나 형제자매를 부양하는 세대주인 경우만 신청할 수 있고, 외국인은 신청할 수 없습니다.",
+      "page": 3
+     },
+     {
+      "label": "해외 체류",
+      "note": "해외에 90일을 넘겨 계속 머문 장기해외체류자는 국내 거주로 인정되지 않아 청약할 수 없습니다.",
+      "page": 2
+     },
+     {
+      "label": "중복 청약 제한",
+      "note": "당첨자 발표일이 같은 모든 주택(APT, 불법행위재공급, 규제지역 무순위)을 통틀어 1인 1건만 신청할 수 있고, 2건 이상 신청하면 모두 무효나 부적격 처리될 수 있습니다.",
+      "page": 2
+     },
+     {
+      "label": "당첨 후 1순위 제한",
+      "note": "당첨되면 계약하지 않아도 당첨자로 관리되고, 당첨자와 그 세대원은 5년간 투기과열지구·청약과열지역 주택의 1순위 청약이 제한됩니다.",
+      "page": 3
+     }
+    ],
+    "analyzedAt": "2026-11-27T17:59:40+09:00",
+    "summary": "이 공고는 서울특별시에 사는 무주택세대주만 신청할 수 있는 불법행위재공급 1세대(59B) 모집이며, 청약통장 없이도 신청할 수 있고 당첨자는 추첨으로 정합니다. 만 19세 이상이어야 하고, 재당첨 제한 10년과 장기해외체류자 신청 불가 조건도 함께 확인해야 합니다."
+   },
+   "pdfUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026930047&pblancNo=2026930047&atchmnflSeqNo=2027014&atchmnflSn=3"
   },
   {
    "id": "ah2026950089",
@@ -2818,17 +3052,39 @@
    "address": "인천광역시 서해구 청라동 86-1번지(인천경제자유구역 청라국제도시 M5BL)",
    "supplyType": "오피스텔",
    "housingRequirement": "확인 필요",
-   "requiredDeposit": null,
-   "depositNote": "공고문에서 예치금·납입 요건 확인 필요",
-   "residenceRequirement": "확인 필요",
-   "eligibleRegions": [],
+   "requiredDeposit": 0,
+   "depositNote": "공고문에서 청약통장 불필요 확인",
+   "residenceRequirement": "전국",
+   "eligibleRegions": [
+    "서울",
+    "경기",
+    "인천",
+    "부산",
+    "울산",
+    "경남",
+    "대구",
+    "경북",
+    "대전",
+    "세종",
+    "충북",
+    "충남",
+    "광주",
+    "전북",
+    "전남",
+    "강원",
+    "제주"
+   ],
    "priorityRegions": [],
    "householderOnly": null,
-   "verified": false,
-   "eligibilityStatus": "needs_review",
+   "verified": true,
+   "eligibilityStatus": "auto_review",
    "evidence": {},
    "extraRequirements": [
-    "신청 자격은 공고문에서 확인해야 합니다"
+    "나이·자격: 분양광고일(2026.11.20.) 현재 국내에 거주하는 만 19세 이상인 사람만 신청할 수 있으며, 국내 거주 재외동포·외국인과 법인도 포함되지만 이들은 중도금 대출이 제한될 수 있습니다.",
+    "중복청약 제한: 한 사람당 타입별로 1실씩, 최대 8건까지 신청할 수 있으며, 같은 타입에 2건 이상 신청하면 신청이 모두 무효가 됩니다.",
+    "청약신청금: 모든 타입에 청약신청금 1,000,000원이 필요하며, 참가은행 출금계좌에 그 이상의 잔액과 이체한도가 있어야 합니다.",
+    "인증서·법인 청약 방법: 청약통장이 없는 사람은 네이버·KB국민·토스·신한·카카오 인증서로 청약할 수 없고, 법인은 인터넷 청약이 안 되며 은행 지점에 방문해서만 신청할 수 있습니다.",
+    "전매 제한: 사용승인 전에 2명 이상에게 전매하거나 전매를 알선할 수 없으며, 위반하면 계약이 취소되고 처벌받을 수 있습니다."
    ],
    "priceLabel": "공급금액(주택형별 최고금액)",
    "priceMin": 98890,
@@ -2884,9 +3140,74 @@
    "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
    "sourceEndpoint": "getUrbtyOfctlLttotPblancDetail",
    "eligibility": {
-    "state": "needs_review",
-    "reason": "공고문 항목별 검토 전입니다."
-   }
+    "state": "auto",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
+    "reviewedAt": "2026-11-27",
+    "validUntil": "2026-12-07",
+    "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950089&pblancNo=2026950089&atchmnflSeqNo=2013062&atchmnflSn=5",
+    "sourceSha256": "b5788df34fd813aaafc9509554712810677d779b6ad20d09941317b6419e5d41",
+    "checks": {
+     "residence": {
+      "kind": "regions",
+      "page": 1,
+      "quote": "본 오피스텔은 거주지역 및 청약통장 가입여부와 무관하게 청약 신청 가능합니다.",
+      "values": [
+       "서울",
+       "경기",
+       "인천",
+       "부산",
+       "울산",
+       "경남",
+       "대구",
+       "경북",
+       "대전",
+       "세종",
+       "충북",
+       "충남",
+       "광주",
+       "전북",
+       "전남",
+       "강원",
+       "제주"
+      ]
+     },
+     "deposit": {
+      "kind": "not_required",
+      "page": 2,
+      "quote": "본 오피스텔은 공동주택 청약통장 순위와 무관하므로, 청약통장이 필요하지 않으며"
+     }
+    },
+    "manualChecks": [
+     {
+      "label": "나이·자격",
+      "note": "분양광고일(2026.11.20.) 현재 국내에 거주하는 만 19세 이상인 사람만 신청할 수 있으며, 국내 거주 재외동포·외국인과 법인도 포함되지만 이들은 중도금 대출이 제한될 수 있습니다.",
+      "page": 20
+     },
+     {
+      "label": "중복청약 제한",
+      "note": "한 사람당 타입별로 1실씩, 최대 8건까지 신청할 수 있으며, 같은 타입에 2건 이상 신청하면 신청이 모두 무효가 됩니다.",
+      "page": 20
+     },
+     {
+      "label": "청약신청금",
+      "note": "모든 타입에 청약신청금 1,000,000원이 필요하며, 참가은행 출금계좌에 그 이상의 잔액과 이체한도가 있어야 합니다.",
+      "page": 21
+     },
+     {
+      "label": "인증서·법인 청약 방법",
+      "note": "청약통장이 없는 사람은 네이버·KB국민·토스·신한·카카오 인증서로 청약할 수 없고, 법인은 인터넷 청약이 안 되며 은행 지점에 방문해서만 신청할 수 있습니다.",
+      "page": 2
+     },
+     {
+      "label": "전매 제한",
+      "note": "사용승인 전에 2명 이상에게 전매하거나 전매를 알선할 수 없으며, 위반하면 계약이 취소되고 처벌받을 수 있습니다.",
+      "page": 1
+     }
+    ],
+    "analyzedAt": "2026-11-27T17:59:40+09:00",
+    "summary": "청라 아크원 푸르지오 오피스텔은 분양광고일(2026.11.20.) 기준으로 국내에 거주하는 만 19세 이상인 사람(국내 거주 재외동포·외국인 포함)과 법인이 신청할 수 있습니다. 거주지역과 상관없이 신청할 수 있고 청약통장도 필요 없습니다. 주택 소유 여부와 세대주 여부는 공고문에 요건으로 나와 있지 않아 확정하지 않았습니다. 타입별로 1건씩 신청할 수 있고, 청약신청금 100만원이 필요합니다."
+   },
+   "pdfUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950089&pblancNo=2026950089&atchmnflSeqNo=2013062&atchmnflSn=5"
   },
   {
    "id": "ah2026000568",
@@ -2902,16 +3223,24 @@
    "supplyType": "APT",
    "housingRequirement": "확인 필요",
    "requiredDeposit": null,
-   "depositNote": "공고문에서 예치금·납입 요건 확인 필요",
-   "residenceRequirement": "확인 필요",
-   "eligibleRegions": [],
+   "depositNote": "지역·면적별 예치금 기준 적용 (거주지와 가장 작은 주택형으로 계산)",
+   "residenceRequirement": "부산·울산·경남",
+   "eligibleRegions": [
+    "부산",
+    "울산",
+    "경남"
+   ],
    "priorityRegions": [],
-   "householderOnly": null,
-   "verified": false,
-   "eligibilityStatus": "needs_review",
+   "householderOnly": false,
+   "verified": true,
+   "eligibilityStatus": "auto_review",
    "evidence": {},
    "extraRequirements": [
-    "신청 자격은 공고문에서 확인해야 합니다"
+    "재당첨 제한: 분양가상한제 적용주택이라 당첨되면 당첨자 발표일부터 10년 동안 재당첨이 제한됩니다.",
+    "가점제 당첨 제한: 입주자모집공고일 기준으로 최근 2년 안에 본인이나 세대원이 가점제로 당첨된 적이 있으면 1순위 가점제로 청약할 수 없습니다.",
+    "해외 체류: 해외에 계속 90일을 넘게 또는 1년에 183일을 넘게 머문 기간은 국내 거주로 인정되지 않아 해당지역 우선공급을 받을 수 없습니다.",
+    "중복 청약: 당첨자 발표일이 같은 주택에는 1인 1건만 신청할 수 있으며, 2건 이상 신청하면 모두 무효 처리될 수 있습니다.",
+    "지역 우선공급: 경쟁이 생기면 사천시 거주자가 경남·부산·울산 거주자보다 먼저 선정됩니다."
    ],
    "priceLabel": "공급금액(주택형별 최고금액)",
    "priceMin": 46625,
@@ -2951,9 +3280,65 @@
    "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
-    "state": "needs_review",
-    "reason": "공고문 항목별 검토 전입니다."
-   }
+    "state": "auto",
+    "checkedAt": "2026-11-27T17:59:40+09:00",
+    "reviewedAt": "2026-11-27",
+    "validUntil": "2026-12-09",
+    "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000568&pblancNo=2026000568&atchmnflSeqNo=2016034&atchmnflSn=5",
+    "sourceSha256": "6168d260c7b6eaa44333d2b50b7df04bdbf0921c9037979f863336d35a6a68b2",
+    "checks": {
+     "residence": {
+      "kind": "regions",
+      "page": 17,
+      "quote": "입주자모집공고일 현재 사천시에 거주하거나 경상남도, 부산광역시, 울산광역시에 거주하는 만19세 이상인 분",
+      "values": [
+       "부산",
+       "울산",
+       "경남"
+      ]
+     },
+     "deposit": {
+      "kind": "standard_table",
+      "page": 17,
+      "quote": "③ 주택청약종합저축 : 주택청약종합저축에 가입하여 6개월이 경과하고, 지역별·면적별 예치금액 이상인 분"
+     },
+     "householder": {
+      "kind": "not_required",
+      "page": 17,
+      "quote": "만19세 이상인 분 또는 세대주인 미성년자(자녀양육, 형제자매부양)"
+     }
+    },
+    "manualChecks": [
+     {
+      "label": "재당첨 제한",
+      "note": "분양가상한제 적용주택이라 당첨되면 당첨자 발표일부터 10년 동안 재당첨이 제한됩니다.",
+      "page": 4
+     },
+     {
+      "label": "가점제 당첨 제한",
+      "note": "입주자모집공고일 기준으로 최근 2년 안에 본인이나 세대원이 가점제로 당첨된 적이 있으면 1순위 가점제로 청약할 수 없습니다.",
+      "page": 20
+     },
+     {
+      "label": "해외 체류",
+      "note": "해외에 계속 90일을 넘게 또는 1년에 183일을 넘게 머문 기간은 국내 거주로 인정되지 않아 해당지역 우선공급을 받을 수 없습니다.",
+      "page": 3
+     },
+     {
+      "label": "중복 청약",
+      "note": "당첨자 발표일이 같은 주택에는 1인 1건만 신청할 수 있으며, 2건 이상 신청하면 모두 무효 처리될 수 있습니다.",
+      "page": 1
+     },
+     {
+      "label": "지역 우선공급",
+      "note": "경쟁이 생기면 사천시 거주자가 경남·부산·울산 거주자보다 먼저 선정됩니다.",
+      "page": 4
+     }
+    ],
+    "analyzedAt": "2026-11-27T17:59:40+09:00",
+    "summary": "이 단지의 일반공급 1순위는 공고일(2026.11.26.) 현재 사천시나 경상남도·부산·울산에 사는 만 19세 이상인 분이 신청할 수 있습니다. 청약통장은 가입한 지 6개월이 지나고 거주지역별·면적별 예치금을 채워야 합니다. 세대주가 아닌 세대원도 신청할 수 있지만, 주택을 가진 사람이 신청할 수 있는지는 공고문에 직접 적혀 있지 않아 확정할 수 없습니다."
+   },
+   "pdfUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000568&pblancNo=2026000568&atchmnflSeqNo=2016034&atchmnflSn=5"
   },
   {
    "id": "ah2026000611",
