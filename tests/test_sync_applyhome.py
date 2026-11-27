@@ -115,6 +115,16 @@ class CollectorTests(unittest.TestCase):
         listings, _ = sync.collect(client, '2026-11-25')
         self.assertEqual([x['pblancNo'] for x in listings], ['3'])
 
+    def test_list_that_suddenly_empties_keeps_last_snapshot(self):
+        with tempfile.TemporaryDirectory() as folder:
+            output, status = Path(folder) / 'listings.json', Path(folder) / 'status.json'
+            old = {'meta': {'scannedCounts': {'apt': 2954, 'rent': 195}}, 'listings': []}
+            output.write_text(json.dumps(old), encoding='utf-8')
+            with self.assertRaises(sync.SyncError):
+                sync.run(FakeClient(), output, status, datetime(2026, 11, 27, 0, 18, tzinfo=sync.KST))
+            self.assertEqual(json.loads(output.read_text(encoding='utf-8')), old)
+            self.assertEqual(json.loads(status.read_text(encoding='utf-8'))['status'], 'error')
+
     def test_all_empty_aborts(self):
         client = FakeClient()
         client.pages = lambda *args: []

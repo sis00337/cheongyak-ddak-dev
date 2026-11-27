@@ -232,6 +232,11 @@ def run(client, output, status_path, now=None, rules_path=None):
     previous = read_json(status_path, {})
     try:
         listings, scanned = collect(client, now.date().isoformat())
+        # 공공데이터 API가 가끔 특정 목록만 0건으로 돌려준다. 직전에 많던 목록이 통째로 비면 반영하지 않는다.
+        before = (read_json(output, {}).get('meta') or {}).get('scannedCounts') or {}
+        emptied = [c for c, n in scanned.items() if n == 0 and isinstance(before.get(c), int) and before[c] >= 10]
+        if emptied:
+            raise SyncError(f'일부 공식 목록({", ".join(emptied)})이 갑자기 비어 기존 데이터를 유지합니다')
         rules = load_rules(rules_path or ROOT / 'data/eligibility-rules.json')
         counts = apply_reviews(listings, rules, client.pdf_digest if hasattr(client, 'pdf_digest') else lambda url: None, now)
         document = {'meta': {
