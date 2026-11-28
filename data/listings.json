@@ -3,7 +3,7 @@
   "source": "한국부동산원 청약홈 분양정보 조회 서비스",
   "sourceUrl": "https://www.data.go.kr/data/15098547/openapi.do",
   "collectedAt": "2026-11-28",
-  "updatedAt": "2026-11-28T17:19:53+09:00",
+  "updatedAt": "2026-11-28T17:48:08+09:00",
   "count": 35,
   "scope": "전국 · APT / 무순위·잔여세대 / 오피스텔·기타 / 공공지원민간임대 / 임의공급",
   "unit": "금액 단위: 만 원",
@@ -98,7 +98,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000505&pblancNo=2026000505&atchmnflSeqNo=2012203&atchmnflSn=4",
@@ -242,7 +242,7 @@
    "sourceEndpoint": "getPblPvtRentLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026850057&pblancNo=2026850057&atchmnflSeqNo=2021998&atchmnflSn=5",
@@ -445,7 +445,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910294&pblancNo=2026910294&atchmnflSeqNo=2031995&atchmnflSn=3",
@@ -585,7 +585,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910303&pblancNo=2026910303&atchmnflSeqNo=2027407&atchmnflSn=6",
@@ -717,7 +717,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "reviewed",
-    "checkedAt": "2026-11-28T17:19:53+09:00",
+    "checkedAt": "2026-11-28T17:48:08+09:00",
     "reviewedAt": "2026-11-25",
     "validUntil": "2026-12-25",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910304&pblancNo=2026910304&atchmnflSeqNo=2027367&atchmnflSn=2",
@@ -834,7 +834,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910305&pblancNo=2026910305&atchmnflSeqNo=2023020&atchmnflSn=4",
@@ -956,7 +956,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-11-30",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026930048&pblancNo=2026930048&atchmnflSeqNo=2027422&atchmnflSn=3",
@@ -1078,7 +1078,7 @@
    "sourceEndpoint": "getPblPvtRentLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026850058&pblancNo=2026850058&atchmnflSeqNo=2027434&atchmnflSn=1",
@@ -1196,7 +1196,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910301&pblancNo=2026910301&atchmnflSeqNo=2022069&atchmnflSn=2",
@@ -1322,7 +1322,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910302&pblancNo=2026910302&atchmnflSeqNo=2022219&atchmnflSn=3",
@@ -1458,7 +1458,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026910311&pblancNo=2026910311&atchmnflSeqNo=2031992&atchmnflSn=6",
@@ -1626,7 +1626,7 @@
    "sourceEndpoint": "getUrbtyOfctlLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-01",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950099&pblancNo=2026950099&atchmnflSeqNo=2038048&atchmnflSn=4",
@@ -1766,7 +1766,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000510&pblancNo=2026000510&atchmnflSeqNo=2028139&atchmnflSn=4",
@@ -1892,7 +1892,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000521&pblancNo=2026000521&atchmnflSeqNo=2028167&atchmnflSn=2",
@@ -2019,7 +2019,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000575&pblancNo=2026000575&atchmnflSeqNo=2027378&atchmnflSn=2",
@@ -2141,7 +2141,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000585&pblancNo=2026000585&atchmnflSeqNo=2021027&atchmnflSn=5",
@@ -2287,7 +2287,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000590&pblancNo=2026000590&atchmnflSeqNo=2016073&atchmnflSn=3",
@@ -2424,7 +2424,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000591&pblancNo=2026000591&atchmnflSeqNo=2027261&atchmnflSn=5",
@@ -2549,7 +2549,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000596&pblancNo=2026000596&atchmnflSeqNo=2027352&atchmnflSn=3",
@@ -2676,7 +2676,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000597&pblancNo=2026000597&atchmnflSeqNo=2028178&atchmnflSn=4",
@@ -2799,7 +2799,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000598&pblancNo=2026000598&atchmnflSeqNo=2027349&atchmnflSn=3",
@@ -2909,7 +2909,7 @@
    "sourceEndpoint": "getRemndrLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-02",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026930047&pblancNo=2026930047&atchmnflSeqNo=2027014&atchmnflSn=3",
@@ -3046,7 +3046,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-04",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000589&pblancNo=2026000589&atchmnflSeqNo=2036074&atchmnflSn=6",
@@ -3206,7 +3206,7 @@
    "sourceEndpoint": "getUrbtyOfctlLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-07",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026950089&pblancNo=2026950089&atchmnflSeqNo=2013062&atchmnflSn=5",
@@ -3346,7 +3346,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-27",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000568&pblancNo=2026000568&atchmnflSeqNo=2016034&atchmnflSn=5",
@@ -3491,7 +3491,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000570&pblancNo=2026000570&atchmnflSeqNo=2026046&atchmnflSn=5",
@@ -3650,7 +3650,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000571&pblancNo=2026000571&atchmnflSeqNo=2026043&atchmnflSn=4",
@@ -3805,7 +3805,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000572&pblancNo=2026000572&atchmnflSeqNo=2027058&atchmnflSn=4",
@@ -3955,7 +3955,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000573&pblancNo=2026000573&atchmnflSeqNo=2026041&atchmnflSn=6",
@@ -4099,7 +4099,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000574&pblancNo=2026000574&atchmnflSeqNo=2014088&atchmnflSn=8",
@@ -4234,7 +4234,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000588&pblancNo=2026000588&atchmnflSeqNo=2037290&atchmnflSn=1",
@@ -4379,7 +4379,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-09",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000592&pblancNo=2026000592&atchmnflSeqNo=2024049&atchmnflSn=7",
@@ -4620,7 +4620,7 @@
    "sourceEndpoint": "getAPTLttotPblancDetail",
    "eligibility": {
     "state": "auto",
-    "checkedAt": "2026-11-28T17:21:58+09:00",
+    "checkedAt": "2026-11-28T17:49:50+09:00",
     "reviewedAt": "2026-11-28",
     "validUntil": "2026-12-10",
     "sourceUrl": "https://static.applyhome.co.kr/ai/aia/getAtchmnfl.do?houseManageNo=2026000612&pblancNo=2026000612&atchmnflSeqNo=2037190&atchmnflSn=3",
