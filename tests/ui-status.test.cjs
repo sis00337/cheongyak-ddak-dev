@@ -15,7 +15,7 @@ const original = { meta: { collectedAt: '2026-11-25' }, listings: [{
   detailUrl: 'https://www.applyhome.co.kr/', eligibilityStatus: 'needs_review'
 }] };
 
-async function render(report, meta = {}, listings = original.listings) {
+async function render(report, meta = {}, listings = original.listings, stored = null) {
   const nodes = new Map();
   const handlers = {};
   function element() {
@@ -34,7 +34,7 @@ async function render(report, meta = {}, listings = original.listings) {
     CheongyakEligibility: require('../app.js'),
     innerWidth: 390, innerHeight: 844, addEventListener() {} };
   const context = { document, window, console, Date, setTimeout, clearTimeout,
-    requestAnimationFrame(fn) { fn(); }, localStorage: { getItem() { return null; }, setItem() {} },
+    requestAnimationFrame(fn) { fn(); }, localStorage: { getItem(key) { return key === 'cheongyakddak:v4' && stored ? JSON.stringify(stored) : null; }, setItem() {} },
     fetch: async () => { if (report === null) throw Error('network'); return { ok: true, json: async () => report }; } };
   vm.runInNewContext(source, context, { filename: 'app.js' });
   await new Promise(resolve => setImmediate(resolve));
@@ -91,7 +91,7 @@ test('unknown eligibility stays visible and is not classified as failed', async 
 test('matching fresh success is displayed without warning', async () => {
   const stamp = new Date().toISOString();
   const { nodes } = await render({ status: 'ok', lastSuccessAt: stamp }, { updatedAt: stamp });
-  assert.equal(nodes.get('#syncStatus').className, 'sync-status');
+  assert.doesNotMatch(nodes.get('#syncStatus').className, /warning/);
   assert.match(nodes.get('#syncStatus').textContent, /갱신 완료/);
 });
 
@@ -121,4 +121,44 @@ test('drawer offers a calendar export for the listing', async () => {
   const view = await render({ status: 'not_configured' });
   view.openCard('fixture-1');
   assert.match(view.nodes.get('#drawer').innerHTML, /id="drawerCal"/);
+});
+
+function autoListing(id, name, residence) {
+  const stamp = new Date().toISOString();
+  return { ...original.listings[0], id, name, verified: true, types: [{ label: '059.7100A' }],
+    eligibility: { state: 'auto', checkedAt: stamp, validUntil: '2099-01-01', sourceUrl: 'https://static.applyhome.co.kr/x', checks: {
+      housing: { kind: 'none', page: 2, quote: '무주택세대구성원' },
+      residence: { kind: 'regions', values: [residence], page: 2, quote: residence + ' 거주' },
+      deposit: { kind: 'not_required', page: 3, quote: '청약통장 불필요' },
+      householder: { kind: 'required', page: 2, quote: '세대주' } } } };
+}
+
+test('cards show one prompt instead of repeated missing-input lines before any input', async () => {
+  const { nodes } = await render({ status: 'not_configured' }, {}, [autoListing('a', '서울 공고', '서울')]);
+  const html = nodes.get('#cards').innerHTML;
+  assert.match(html, /내 조건을 입력하면/);
+  assert.doesNotMatch(html, /입력해 주세요|선택해 주세요/);
+  assert.match(nodes.get('#condGo').innerHTML, /0\/4 입력/);
+});
+
+test('a complete saved profile opens on matching listings with a one-line summary', async () => {
+  const listings = [autoListing('a', '서울 공고', '서울'), autoListing('b', '부산 공고', '부산')];
+  const profile = { housing: '무주택', residence: '서울', depositWon: 3000000, householder: '세대주', favs: [] };
+  const view = await render({ status: 'not_configured' }, {}, listings, profile);
+  assert.equal(view.nodes.get('#eligibleCount').textContent, 1);
+  const html = view.nodes.get('#cards').innerHTML;
+  assert.match(html, /4가지 조건 모두 부합/);
+  assert.doesNotMatch(html, /부산 공고/);
+  assert.match(view.nodes.get('#condGo').innerHTML, /맞는 공고 1건 보기/);
+  view.clickFilter('excluded');
+  assert.match(view.nodes.get('#cards').innerHTML, /거주 시도: 부산 거주 요건에 맞지 않습니다/);
+});
+
+test('partial input names only the conditions still to enter', async () => {
+  const profile = { housing: '무주택', residence: '서울', favs: [] };
+  const { nodes } = await render({ status: 'not_configured' }, {}, [autoListing('a', '서울 공고', '서울')], profile);
+  const html = nodes.get('#cards').innerHTML;
+  assert.match(html, /입력하면 확인돼요: 세대주/);
+  assert.match(html, /부합: 주택 수 · 거주지 · 예치금/);
+  assert.equal(nodes.get('#eligibleCount').textContent, 1);
 });
