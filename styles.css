@@ -1397,3 +1397,11 @@ button:focus-visible, [tabindex]:focus-visible, select:focus-visible, input:focu
   .hero-sub { margin-top: 8px; }
 }
 .results-head, #condCard { scroll-margin-top: 120px; }
+
+/* 나이·혼인 입력 */
+.field-pair { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 12px; align-items: start; }
+.field-pair .field-label { margin-bottom: 8px; }
+.age-input { margin-top: 0; }
+.age-input .di-field { width: 100%; min-width: 0; }
+.age-input input { min-width: 0; width: 100%; }
+.field-note { margin: -4px 0 12px; font-size: 12px; color: var(--ink-3); }

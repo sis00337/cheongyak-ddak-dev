@@ -130,6 +130,38 @@ class AutoEligibilityTests(unittest.TestCase):
         self.assertFalse(accepted('세대주 요건 | 일반공급: 필요'))
         self.assertFalse(accepted('소득 기준 | 생애최초: 필요'))
 
+    def test_rental_without_residence_limit_and_age_marriage(self):
+        payload = raw()
+        payload['checks']['residence'] = {'kind': 'not_required', 'values': [], 'page': 2,
+                                          'quote': '입주자모집공고일 현재 서울특별시에 거주하는'}
+        payload['checks']['age'] = {'kind': 'range', 'minAge': 19, 'maxAge': 0, 'page': 2, 'quote': '만19세 이상 무주택세대구성원 중 세대주'}
+        payload['checks']['marriage'] = {'kind': 'not_required', 'page': 2, 'quote': '만19세 이상 무주택세대구성원 중 세대주'}
+        items, _, _ = run(FakeClient(payload))
+        checks = items[0]['eligibility']['checks']
+        self.assertEqual(checks['residence']['kind'], 'not_required')
+        self.assertNotIn('values', checks['residence'])
+        self.assertEqual((checks['age']['minAge'], checks['age']['maxAge']), (19, 0))
+        self.assertEqual(checks['marriage']['kind'], 'not_required')
+        self.assertEqual(items[0]['residenceRequirement'], '거주지 무관')
+
+    def test_bad_age_range_is_dropped(self):
+        payload = raw()
+        payload['checks']['age'] = {'kind': 'range', 'minAge': 40, 'maxAge': 39, 'page': 2, 'quote': '만19세 이상 무주택세대구성원 중 세대주'}
+        items, _, _ = run(FakeClient(payload))
+        self.assertNotIn('age', items[0]['eligibility']['checks'])
+
+    def test_old_prompt_version_is_shown_until_its_turn_to_reanalyse(self):
+        _, cache, _ = run(FakeClient(raw()))
+        cache['entries']['2026000560-2026000560']['promptVersion'] = auto.PROMPT_VERSION - 1
+        client = FakeClient(raw())
+        with mock.patch.object(auto, 'extract_pages', return_value=PAGES):
+            item = listing()
+            _, counts = auto.run([item], cache, Fetcher(), client, NOW, max_new=0, log=lambda m: None)
+        self.assertEqual(client.calls, 0)
+        self.assertEqual(item['eligibility']['state'], 'auto')
+        items, cache2, _ = run(FakeClient(raw()), cache)
+        self.assertEqual(cache2['entries']['2026000560-2026000560']['promptVersion'], auto.PROMPT_VERSION)
+
     def test_cached_analysis_is_reused_without_calling_claude(self):
         _, cache, _ = run(FakeClient(raw()))
         client = FakeClient(raw())
