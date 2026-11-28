@@ -1375,3 +1375,25 @@ button:focus-visible, [tabindex]:focus-visible, select:focus-visible, input:focu
 .condition-check p, .condition-check blockquote { font-size: 13px; margin: 8px 0 0; }
 .condition-check blockquote { border-left: 3px solid #d5e4f5; padding-left: 10px; color: #536477; }
 .condition-check a, .review-meta { display: block; margin-top: 8px; font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+
+/* 조건 입력 진행도와 결과 바로가기 */
+.cond-go { margin-top: 16px; display: flex; flex-direction: column; gap: 10px; }
+.cg-text { margin: 0; font-size: 13px; color: var(--ink-2, #4e5968); line-height: 1.5; }
+.cg-step { display: inline-block; margin-right: 6px; padding: 2px 8px; border-radius: 999px; background: #f2f4f6; color: #4e5968; font-weight: 700; font-size: 12px; }
+.cg-step.cg-done { background: #e8f3ff; color: #1b64da; }
+.cg-btn { width: 100%; padding: 14px 16px; border: 0; border-radius: 12px; background: #3182f6; color: #fff; font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; }
+.cg-btn:hover { background: #1b64da; }
+.cg-btn:focus-visible { outline: 3px solid #a5ccff; outline-offset: 2px; }
+@media (min-width: 980px) { .cond-go { display: none; } }
+
+/* 정상 갱신일 때는 한 줄로만 */
+.sync-status--ok { display: inline-block; padding: 6px 12px; border-radius: 999px; font-size: 12.5px; line-height: 1.4; background: #e8f7ef; color: #11804a; }
+
+/* 휴대폰 첫 화면에서 조건 입력이 더 빨리 보이게 */
+@media (max-width: 639px) {
+  .hero { padding: 14px 0 18px; }
+  .hero .eyebrow, .hero .hero-points { display: none; }
+  .hero h1 { font-size: 24px; }
+  .hero-sub { margin-top: 8px; }
+}
+.results-head, #condCard { scroll-margin-top: 120px; }

@@ -28,27 +28,27 @@
         row.status = 'not_applicable'; row.text = '이 공고는 해당 요건을 요구하지 않습니다.'; return row;
       }
       if (key === 'housing' && ['none', 'max_one'].indexOf(rule.kind) !== -1) {
-        if (['무주택', '1주택', '2주택+'].indexOf(input) === -1) { row.text = '공고일 기준 세대 주택 수를 입력해 주세요.'; return row; }
+        if (['무주택', '1주택', '2주택+'].indexOf(input) === -1) { row.text = '공고일 기준 세대 주택 수를 입력해 주세요.'; row.needsInput = true; return row; }
         pass = rule.kind === 'none' ? input === '무주택' : input !== '2주택+';
         row.text = pass ? '입력한 세대 주택 수가 확인된 조건에 부합합니다.' : (rule.kind === 'none' ? '무주택세대구성원 요건에 맞지 않습니다.' : '확인된 주택 수 요건에 맞지 않습니다.');
       } else if (key === 'residence' && rule.kind === 'regions' && Array.isArray(rule.values) && rule.values.length && rule.values.every(function (v) { return regions.indexOf(v) !== -1; })) {
-        if (regions.indexOf(input) === -1) { row.text = '공고일 기준 거주 시도를 선택해 주세요.'; return row; }
+        if (regions.indexOf(input) === -1) { row.text = '공고일 기준 거주 시도를 선택해 주세요.'; row.needsInput = true; return row; }
         pass = rule.values.indexOf(input) !== -1;
         row.text = pass ? '입력한 거주 시도가 확인된 지역 조건에 부합합니다.' : rule.values.join('·') + ' 거주 요건에 맞지 않습니다.';
       } else if (key === 'deposit' && rule.kind === 'minimum' && Number.isSafeInteger(rule.amountWon) && rule.amountWon > 0) {
-        if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; return row; }
+        if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; row.needsInput = true; return row; }
         pass = input >= rule.amountWon;
         row.text = pass ? '입력한 예치금이 확인된 기준에 부합합니다.' : '예치금 ' + (rule.amountWon - input).toLocaleString('ko-KR') + '원 부족';
       } else if (key === 'deposit' && rule.kind === 'standard_table') {
         var area = smallestArea(listing);
         var need = regions.indexOf(profile.residence) === -1 || area == null ? null : standardDeposit(profile.residence, area);
-        if (need == null) { row.text = '거주 시도를 선택하면 지역·면적별 예치금 기준으로 계산해요.'; return row; }
-        if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; return row; }
+        if (need == null) { row.text = '거주 시도를 선택하면 지역·면적별 예치금 기준으로 계산해요.'; row.needsInput = true; return row; }
+        if (!Number.isSafeInteger(input) || input < 0) { row.text = '공고일 기준 예치금을 입력해 주세요.'; row.needsInput = true; return row; }
         pass = input >= need;
         row.text = (pass ? '' : '예치금 ' + (need - input).toLocaleString('ko-KR') + '원 부족 · ') +
           profile.residence + ' 거주, 가장 작은 주택형(' + area + '㎡) 기준 ' + (need / 10000).toLocaleString('ko-KR') + '만 원';
       } else if (key === 'householder' && rule.kind === 'required') {
-        if (['세대주', '세대원'].indexOf(input) === -1) { row.text = '공고일 기준 세대주 여부를 선택해 주세요.'; return row; }
+        if (['세대주', '세대원'].indexOf(input) === -1) { row.text = '공고일 기준 세대주 여부를 선택해 주세요.'; row.needsInput = true; return row; }
         pass = input === '세대주'; row.text = pass ? '입력한 세대주 조건이 부합합니다.' : '세대주 요건에 맞지 않습니다.';
       } else return row;
       row.status = pass ? 'pass' : 'fail';
@@ -391,6 +391,7 @@
     renderDeposit(!(opts && opts.keepInput));
     renderMini();
     evaluateAll();
+    maybeFocusEligible();
     renderResults();
     save();
   }
@@ -483,10 +484,35 @@
     });
   }
 
+  /* 카드에는 요약만 보여 준다. 조건별 전체 문장과 근거는 상세(드로어)에 그대로 남긴다. */
+  var SHORT = { housing: '주택 수', residence: '거주지', deposit: '예치금', householder: '세대주' };
+  function filledCount() {
+    return (state.housing ? 1 : 0) + (state.residence ? 1 : 0) + (state.deposit != null ? 1 : 0) + (state.householder ? 1 : 0);
+  }
+  function missingInputs() {
+    var out = [];
+    if (!state.housing) out.push('주택 수');
+    if (!state.residence) out.push('거주지');
+    if (state.deposit == null) out.push('예치금');
+    if (!state.householder) out.push('세대주 여부');
+    return out;
+  }
   function reasonsFor(e) {
     if (e.checks) {
-      var ordered = e.checks.slice().sort(function (a, b) { return ({ fail: 0, pass: 1, not_applicable: 1, unknown: 2 })[a.status] - ({ fail: 0, pass: 1, not_applicable: 1, unknown: 2 })[b.status]; });
-      var shown = ordered.map(function (r) { return { t: r.status === 'fail' ? 'no' : r.status === 'unknown' ? 'warn' : 'ok', text: r.label + ': ' + r.text }; });
+      if (!e.reviewUsable) {
+        return { shown: [{ t: 'warn', text: '공고문 원문과 아직 대조하지 않았어요. 자격은 공고문에서 직접 확인해 주세요.' }], extra: 0 };
+      }
+      if (filledCount() === 0) {
+        return { shown: [{ t: 'warn', text: '내 조건을 입력하면 주택 수·거주지·예치금·세대주 요건을 공고문과 비교해 드려요.' }], extra: 0 };
+      }
+      var shown = [];
+      e.checks.forEach(function (r) { if (r.status === 'fail') shown.push({ t: 'no', text: r.label + ': ' + r.text }); });
+      var need = e.checks.filter(function (r) { return r.status === 'unknown' && r.needsInput; });
+      var open = e.checks.filter(function (r) { return r.status === 'unknown' && !r.needsInput; });
+      var pass = e.checks.filter(function (r) { return r.status === 'pass' || r.status === 'not_applicable'; });
+      if (open.length) shown.push({ t: 'warn', text: '공고문 확인 필요: ' + open.map(function (r) { return SHORT[r.key]; }).join(' · ') });
+      if (need.length) shown.push({ t: 'warn', text: '입력하면 확인돼요: ' + need.map(function (r) { return SHORT[r.key]; }).join(' · ') });
+      if (pass.length) shown.push({ t: 'ok', text: (pass.length === e.checks.length ? '4가지 조건 모두 부합: ' : '부합: ') + pass.map(function (r) { return SHORT[r.key]; }).join(' · ') });
       return { shown: shown, extra: 0 };
     }
     var items = [];
@@ -662,11 +688,11 @@
       '<br>원문 대조된 공고 ' + evalCache.filter(function (e) { return e.reviewUsable; }).length + '/' + c.total + '건 · 최종 자격은 별도 확인';
 
     $('#segFilter').innerHTML = [
+      { v: 'all', l: '전체', n: c.total },
       { v: 'eligible', l: '조건 부합', n: c.ok },
-      { v: 'excluded', l: '조건 미달', n: c.excluded },
       { v: 'unknown', l: '확인 필요', n: c.unknown },
-      { v: 'fav', l: '관심', n: state.favs.length },
-      { v: 'all', l: '전체', n: c.total }
+      { v: 'excluded', l: '조건 미달', n: c.excluded },
+      { v: 'fav', l: '관심', n: state.favs.length }
     ].map(function (o) {
       return '<button type="button" data-filter="' + o.v + '" aria-pressed="' + (state.filter === o.v) + '">' +
         o.l + ' <span class="seg-count">' + o.n + '</span></button>';
@@ -682,6 +708,32 @@
 
     renderOverlap();
     renderInterestBar();
+    renderCondGo(c);
+  }
+
+  /* 조건 카드 아래: 몇 개를 입력했는지와 결과로 바로 가는 버튼 */
+  function renderCondGo(c) {
+    var host = $('#condGo');
+    if (!host) return;
+    var miss = missingInputs();
+    var text = miss.length
+      ? '<span class="cg-step">' + (4 - miss.length) + '/4 입력</span> 남은 조건: ' + esc(miss.join(', '))
+      : '<span class="cg-step cg-done">4/4 입력</span> 조건 부합 ' + c.ok + '건 · 확인 필요 ' + c.unknown + '건';
+    var btn = miss.length || !c.ok ? '공고 보기 ↓' : '맞는 공고 ' + c.ok + '건 보기 ↓';
+    host.innerHTML = '<p class="cg-text">' + text + '</p>' +
+      '<button type="button" class="cg-btn" data-go-results="' + (miss.length || !c.ok ? 'all' : 'eligible') + '">' + btn + '</button>';
+  }
+
+  /* 4가지 조건을 처음 다 채운 순간, 사용자가 필터를 고른 적이 없으면 부합 공고부터 보여 준다 */
+  var filterTouched = false;
+  var wasComplete = false;
+  function maybeFocusEligible() {
+    var complete = filledCount() === 4;
+    if (complete && !wasComplete && !filterTouched && state.filter === 'all') {
+      var ok = evalCache.filter(function (e) { return e.ok; }).length;
+      if (ok) state.filter = 'eligible';
+    }
+    wasComplete = complete;
   }
 
   function emptyHTML() {
@@ -1007,6 +1059,7 @@
   function refresh() {
     renderCondition();
     evaluateAll();
+    maybeFocusEligible();
     renderResults();
   }
 
@@ -1038,7 +1091,16 @@
       }
 
       var fbtn = ev.target.closest('[data-filter]');
-      if (fbtn) { state.filter = fbtn.getAttribute('data-filter'); renderResults(); return; }
+      if (fbtn) { filterTouched = true; state.filter = fbtn.getAttribute('data-filter'); renderResults(); return; }
+
+      var go = ev.target.closest('[data-go-results]');
+      if (go) {
+        filterTouched = true;
+        state.filter = go.getAttribute('data-go-results');
+        renderResults();
+        $('.results-head').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
 
       var favBtn = ev.target.closest('[data-fav]');
       if (favBtn) {
@@ -1147,6 +1209,7 @@
     state.favs = state.favs.filter(function (id) { return !!byId(id); });
     renderCondition();
     evaluateAll();
+    maybeFocusEligible();
     renderResults();
     setupMiniBar();
     bind();
@@ -1159,6 +1222,13 @@
     if (typeof navigator === 'undefined' || !navigator.serviceWorker || typeof location === 'undefined') return;
     if (location.protocol !== 'https:' && location.hostname !== 'localhost') return;
     navigator.serviceWorker.register('sw.js').catch(function () {});
+  }
+
+  function shortTime(d) {
+    var parts = d.toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: 'long', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    var today = new Date().toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' });
+    var same = d.toLocaleDateString('ko-KR', { timeZone: 'Asia/Seoul' }) === today;
+    return same ? '오늘 ' + d.toLocaleTimeString('ko-KR', { timeZone: 'Asia/Seoul', hour: 'numeric', minute: '2-digit' }) : parts;
   }
 
   function renderSyncStatus(sync) {
@@ -1174,9 +1244,11 @@
     else if (sync.status === 'error') message = '최근 갱신에 실패했습니다. 이전 공고를 표시하니 일정은 원문에서 확인해 주세요.';
     else if (sync.status !== 'ok' || sync.lastSuccessAt !== META.updatedAt) message = '공고와 갱신 상태를 확인 중입니다. 잠시 후 다시 확인해 주세요.';
     else if (stale) message = '마지막 갱신 후 30시간 이상 지났습니다. 최신 일정은 공고 원문을 확인해 주세요.';
-    else { message = '공식 공고 데이터 갱신 완료 · 신청 자격은 별도 확인이 필요합니다.'; warning = false; }
-    host.className = 'sync-status' + (warning ? ' sync-status--warning' : '');
-    host.textContent = message + ' 마지막 데이터 갱신: ' + time + ' (한국시간)';
+    else { message = '청약홈 공고 갱신 완료'; warning = false; }
+    host.className = 'sync-status' + (warning ? ' sync-status--warning' : ' sync-status--ok');
+    host.textContent = warning
+      ? message + ' 마지막 데이터 갱신: ' + time + ' (한국시간)'
+      : '✓ ' + message + ' · ' + shortTime(parsed);
     var source = $('#dataSourceNote');
     if (source) source.textContent = (META.source || '청약홈 입주자모집공고') + ' · 데이터 기준일 ' + (META.collectedAt || '확인 불가') + ' · 최종 자격과 일정은 공고문 원문으로 확인하세요.';
   }
