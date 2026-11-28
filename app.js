@@ -6,6 +6,8 @@
   'use strict';
   var regions = ['서울', '경기', '인천', '부산', '울산', '경남', '대구', '경북', '대전', '세종', '충북', '충남', '광주', '전북', '전남', '강원', '제주'];
   var labels = { housing: '세대 주택 수', residence: '거주 시도', deposit: '청약통장 예치금', householder: '세대주 여부' };
+  /* 나이·혼인은 공고문에 기준이 있을 때만 비교 항목에 넣는다. */
+  var extraLabels = { age: '나이', marriage: '혼인 여부' };
 
   function evaluate(listing, profile, status, now) {
     now = now || new Date();
@@ -15,9 +17,10 @@
     var usable = (review.state === 'reviewed' || review.state === 'auto') && review.validUntil >= today &&
       isFinite(checked) && now.getTime() - checked <= 30 * 3600000 && checked <= now.getTime() + 60000;
     var definitions = usable ? review.checks || {} : {};
-    var rows = Object.keys(labels).map(function (key) {
+    var keys = Object.keys(labels).concat(Object.keys(extraLabels).filter(function (k) { return definitions[k]; }));
+    var rows = keys.map(function (key) {
       var rule = definitions[key];
-      var row = { key: key, label: labels[key], status: 'unknown', text: '공고문에서 이 조건을 확인해야 합니다.' };
+      var row = { key: key, label: labels[key] || extraLabels[key], status: 'unknown', text: '공고문에서 이 조건을 확인해야 합니다.' };
       if (!rule || !rule.quote || !Number.isInteger(rule.page) || rule.page < 1) return row;
       row.quote = rule.quote;
       row.page = rule.page;
@@ -50,6 +53,15 @@
       } else if (key === 'householder' && rule.kind === 'required') {
         if (['세대주', '세대원'].indexOf(input) === -1) { row.text = '공고일 기준 세대주 여부를 선택해 주세요.'; row.needsInput = true; return row; }
         pass = input === '세대주'; row.text = pass ? '입력한 세대주 조건이 부합합니다.' : '세대주 요건에 맞지 않습니다.';
+      } else if (key === 'age' && rule.kind === 'range' && Number.isInteger(rule.minAge) && Number.isInteger(rule.maxAge) && (rule.minAge || rule.maxAge)) {
+        var range = rule.maxAge ? '만 ' + rule.minAge + '~' + rule.maxAge + '세' : '만 ' + rule.minAge + '세 이상';
+        if (!Number.isInteger(input) || input < 0 || input > 120) { row.text = '공고일 기준 만 나이를 입력해 주세요 (기준: ' + range + ').'; row.needsInput = true; return row; }
+        pass = input >= rule.minAge && (!rule.maxAge || input <= rule.maxAge);
+        row.text = pass ? '입력한 나이가 ' + range + ' 기준에 부합합니다.' : range + ' 기준에 맞지 않습니다.';
+      } else if (key === 'marriage' && (rule.kind === 'married' || rule.kind === 'single')) {
+        if (['기혼', '미혼'].indexOf(input) === -1) { row.text = '혼인 여부를 선택해 주세요.'; row.needsInput = true; return row; }
+        pass = rule.kind === 'married' ? input === '기혼' : input === '미혼';
+        row.text = pass ? '입력한 혼인 여부가 조건에 부합합니다.' : (rule.kind === 'married' ? '혼인한 분만 신청할 수 있습니다.' : '미혼인 분만 신청할 수 있습니다.');
       } else return row;
       row.status = pass ? 'pass' : 'fail';
       return row;
@@ -180,6 +192,10 @@
     { v: '세대주', l: '세대주' },
     { v: '세대원', l: '세대원' }
   ];
+  var MARRIAGE = [
+    { v: '미혼', l: '미혼' },
+    { v: '기혼', l: '기혼' }
+  ];
   var DEPOSIT_CHIPS = [
     { v: 0, l: '없음' },
     { v: 2000000, l: '200만' },
@@ -202,6 +218,8 @@
     residence: '',
     deposit: null,          /* 원 단위. 미입력과 0원을 구분한다. */
     householder: '',
+    age: null,              /* 만 나이. 미입력은 null */
+    marriage: '',
     filter: 'all',
     sort: 'deadline',
     favs: []
@@ -298,6 +316,8 @@
         residence: state.residence,
         depositWon: state.deposit,
         householder: state.householder,
+        age: state.age,
+        marriage: state.marriage,
         favs: state.favs
       }));
     } catch (e) { /* 저장 실패는 무시 */ }
@@ -323,6 +343,8 @@
         state.deposit = Math.min(Math.round(s.depositWon), 999999999);
       }
       if (HOUSEHOLDER.some(function (o) { return o.v === s.householder; })) state.householder = s.householder;
+      if (Number.isInteger(s.age) && s.age >= 0 && s.age <= 120) state.age = s.age;
+      if (MARRIAGE.some(function (o) { return o.v === s.marriage; })) state.marriage = s.marriage;
       if (Array.isArray(s.favs)) state.favs = s.favs.slice(0, 20);
     } catch (e) { /* 무시 */ }
   }
@@ -360,6 +382,9 @@
   function renderCondition() {
     $('#segHousing').innerHTML = segHTML(HOUSING, state.housing, 'housing');
     $('#segHouseholder').innerHTML = segHTML(HOUSEHOLDER, state.householder, 'householder');
+    $('#segMarriage').innerHTML = segHTML(MARRIAGE, state.marriage, 'marriage');
+    var ageInput = $('#ageInput');
+    if (ageInput && document.activeElement !== ageInput) ageInput.value = state.age == null ? '' : String(state.age);
     $('#segResidence').innerHTML = regionHTML();
     renderDeposit(true);
     renderMini();
@@ -401,7 +426,9 @@
       '<span class="mini-chip"><b>' + esc(state.residence || '거주지 미입력') + '</b></span>' +
       '<span class="mini-chip"><b>' + esc(state.housing || '주택 수 미입력') + '</b></span>' +
       '<span class="mini-chip"><b>' + (state.deposit == null ? '예치금 미입력' : '예치금 ' + moneyChip(state.deposit)) + '</b></span>' +
-      '<span class="mini-chip">' + esc(state.householder || '세대주 여부 미입력') + '</span>';
+      '<span class="mini-chip">' + esc(state.householder || '세대주 여부 미입력') + '</span>' +
+      (state.age == null ? '' : '<span class="mini-chip">만 ' + state.age + '세</span>') +
+      (state.marriage ? '<span class="mini-chip">' + esc(state.marriage) + '</span>' : '');
   }
 
   /* ───────────────────────── 결과 ───────────────────────── */
@@ -485,7 +512,7 @@
   }
 
   /* 카드에는 요약만 보여 준다. 조건별 전체 문장과 근거는 상세(드로어)에 그대로 남긴다. */
-  var SHORT = { housing: '주택 수', residence: '거주지', deposit: '예치금', householder: '세대주' };
+  var SHORT = { housing: '주택 수', residence: '거주지', deposit: '예치금', householder: '세대주', age: '나이', marriage: '혼인' };
   function filledCount() {
     return (state.housing ? 1 : 0) + (state.residence ? 1 : 0) + (state.deposit != null ? 1 : 0) + (state.householder ? 1 : 0);
   }
@@ -512,7 +539,7 @@
       var pass = e.checks.filter(function (r) { return r.status === 'pass' || r.status === 'not_applicable'; });
       if (open.length) shown.push({ t: 'warn', text: '공고문 확인 필요: ' + open.map(function (r) { return SHORT[r.key]; }).join(' · ') });
       if (need.length) shown.push({ t: 'warn', text: '입력하면 확인돼요: ' + need.map(function (r) { return SHORT[r.key]; }).join(' · ') });
-      if (pass.length) shown.push({ t: 'ok', text: (pass.length === e.checks.length ? '4가지 조건 모두 부합: ' : '부합: ') + pass.map(function (r) { return SHORT[r.key]; }).join(' · ') });
+      if (pass.length) shown.push({ t: 'ok', text: (pass.length === e.checks.length ? e.checks.length + '가지 조건 모두 부합: ' : '부합: ') + pass.map(function (r) { return SHORT[r.key]; }).join(' · ') });
       return { shown: shown, extra: 0 };
     }
     var items = [];
@@ -1177,6 +1204,15 @@
     });
     dInput.addEventListener('keydown', function (ev) {
       if (ev.key === 'Enter') { ev.preventDefault(); dInput.blur(); }
+    });
+
+    var aInput = $('#ageInput');
+    aInput.addEventListener('input', function (ev) {
+      var digits = ev.target.value.replace(/\D/g, '').slice(0, 3);
+      if (digits !== ev.target.value) ev.target.value = digits;
+      var age = digits === '' ? null : Number(digits);
+      state.age = age != null && age <= 120 ? age : null;
+      save(); refresh();
     });
 
     $('#sortSel').addEventListener('change', function (ev) {

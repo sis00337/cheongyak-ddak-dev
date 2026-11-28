@@ -8,8 +8,10 @@ from pathlib import Path
 from urllib.parse import parse_qs, urlparse
 
 REGIONS = {'서울', '경기', '인천', '부산', '울산', '경남', '대구', '경북', '대전', '세종', '충북', '충남', '광주', '전북', '전남', '강원', '제주'}
-KINDS = {'housing': {'none', 'max_one', 'not_required'}, 'residence': {'regions'},
-         'deposit': {'minimum', 'not_required', 'standard_table'}, 'householder': {'required', 'not_required'}}
+KINDS = {'housing': {'none', 'max_one', 'not_required'}, 'residence': {'regions', 'not_required'},
+         'deposit': {'minimum', 'not_required', 'standard_table'}, 'householder': {'required', 'not_required'},
+         # 나이·혼인은 공고문에 있을 때만 붙는 추가 조건이다.
+         'age': {'range', 'not_required'}, 'marriage': {'married', 'single', 'not_required'}}
 
 
 def validate_rule(rule):
@@ -36,10 +38,15 @@ def validate_rule(rule):
             raise ValueError('지원하지 않는 검토 조건')
         if type(check.get('page')) is not int or check['page'] < 1 or not check.get('quote', '').strip():
             raise ValueError('페이지·근거 누락')
-        if key == 'residence' and (not check.get('values') or not set(check['values']) <= REGIONS):
+        if key == 'residence' and check['kind'] == 'regions' and (not check.get('values') or not set(check['values']) <= REGIONS):
             raise ValueError('거주 시도 오류')
         if check['kind'] == 'minimum' and (type(check.get('amountWon')) is not int or check['amountWon'] <= 0):
             raise ValueError('예치금 단위·금액 오류')
+        if check['kind'] == 'range':
+            low, high = check.get('minAge'), check.get('maxAge')
+            if (type(low) is not int or type(high) is not int or not 0 <= low <= 100 or not 0 <= high <= 120
+                    or (low == 0 and high == 0) or (high and high < low)):
+                raise ValueError('나이 기준 오류')
     if not isinstance(rule['manualChecks'], list) or not rule['manualChecks']:
         raise ValueError('추가 확인 사항 누락')
     for item in rule['manualChecks']:
@@ -115,7 +122,8 @@ def attach_review(listing, rule, digest, now, state='reviewed', extra=None):
     listing['housingRequirement'] = {'none': '무주택 전용', 'max_one': '1주택 가능', 'not_required': '무관'}.get(housing, '확인 필요')
     residence = checks.get('residence', {}).get('values', [])
     listing['eligibleRegions'] = list(residence)
-    listing['residenceRequirement'] = '전국' if len(residence) == 17 else '·'.join(residence) or '확인 필요'
+    listing['residenceRequirement'] = ('거주지 무관' if checks.get('residence', {}).get('kind') == 'not_required'
+                                      else '전국' if len(residence) == 17 else '·'.join(residence) or '확인 필요')
     deposit = checks.get('deposit', {})
     kind = deposit.get('kind')
     listing['requiredDeposit'] = 0 if kind == 'not_required' else (deposit['amountWon'] / 10000 if kind == 'minimum' else None)

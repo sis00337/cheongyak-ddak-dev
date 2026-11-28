@@ -25,14 +25,14 @@ from urllib.parse import parse_qs, urlparse
 from urllib.request import Request, urlopen
 
 try:
-    from scripts.eligibility_rules import REGIONS, attach_review, pdf_bytes, validate_rule
+    from scripts.eligibility_rules import KINDS, REGIONS, attach_review, pdf_bytes, validate_rule
 except ImportError:
-    from eligibility_rules import REGIONS, attach_review, pdf_bytes, validate_rule
+    from eligibility_rules import KINDS, REGIONS, attach_review, pdf_bytes, validate_rule
 
 ROOT = Path(__file__).resolve().parents[1]
 KST = timezone(timedelta(hours=9))
 MODEL = 'claude-opus-5-5'
-PROMPT_VERSION = 2
+PROMPT_VERSION = 3
 MAX_CHARS = 90000
 MAX_NEW_PER_RUN = 15
 REGION_LIST = ['서울', '경기', '인천', '부산', '울산', '경남', '대구', '경북', '대전', '세종',
@@ -52,22 +52,31 @@ SYSTEM = """당신은 한국 아파트·오피스텔 청약 입주자모집공�
 - housing: 무주택세대구성원만 가능하면 "none", 1주택까지 가능하면 "max_one", 주택 소유와 무관하면 "not_required".
 - residence: 신청할 수 있는 거주 시도 전체를 values에 넣고 kind는 "regions". 국내 거주자 누구나 가능하면 17개 시도를 모두 넣습니다.
   우선공급 지역만이 아니라 신청이 허용되는 지역(해당지역 + 기타지역) 전체입니다.
+  신청자격 문장이 자격 요건을 모두 나열하는데 거주지역 요건이 없으면(민간임대 일반공급 등) kind를 "not_required"로 두고
+  그 신청자격 문장을 quote로 쓰세요. 지역 우선순위만 있고 신청 자체는 막지 않는 경우도 "not_required"이며, 우선순위는 manualChecks에 적습니다.
 - deposit: 청약통장이 필요 없으면 "not_required". 금액 하나가 모두에게 적용되면 "minimum"과 amountWon(원 단위).
   민영주택처럼 '거주지역별·전용면적별 예치금액' 기준을 적용하면 "standard_table". 그 외(국민주택 납입횟수 등)는 "unknown".
   amountWon은 "minimum"일 때만 의미가 있고, 그 밖에는 0을 넣으세요.
 - householder: 세대주만 신청 가능하면 "required", 세대원도 가능하면 "not_required".
+- age: 신청자의 만 나이 기준. 하한·상한이 있으면 "range"와 minAge·maxAge(없는 쪽은 0). 예: 만19세 이상 → minAge 19, maxAge 0.
+  청년(만19~39세)처럼 상한이 있으면 maxAge 39. 나이 기준이 없으면 "not_required". 그 밖에는 0, 0.
+- marriage: 혼인한 사람만 가능하면(신혼부부 전용 등) "married", 미혼만 가능하면 "single", 혼인 여부와 무관하면 "not_required".
+  공고가 공급 유형(청년·신혼부부·일반 등)별로 나뉘면 일반공급 기준이고, 일반공급이 없으면 공고의 대표 공급 유형 기준입니다.
 - quote: 판단 근거가 된 공고문 문장을 한 글자도 바꾸지 말고 그대로 짧게(15~80자) 옮기세요. 요약하거나 고치면 검증에서 탈락합니다.
 - 표는 각 쪽 끝 [표] 아래에 "행 제목 | 열 제목: 값" 꼴로 다시 적혀 있습니다. 표가 근거라면 그 줄에서 해당 칸("세대주 요건 | 생애최초: 필요" 등)을 그대로 옮기고, 열 제목을 보고 어느 공급 유형에 해당하는지 판단하세요. 1순위 일반공급에 해당하는 칸이 아니면 그 조건의 근거로 쓰지 마세요.
 - quote는 반드시 조건을 직접 말하는 문장이어야 합니다. 열 제목 없이 뭉개진 표 조각("세대주 요건 - - 필요 -")이나 다른 조건을 설명하는 문장은 근거가 아니니, 그런 것밖에 없으면 kind를 "unknown"으로 두세요.
 - page: quote가 있는 쪽 번호. 텍스트의 [p.N] 표시를 따릅니다.
 - kind가 "unknown"이면 page는 0, quote는 빈 문자열로 둡니다.
-- manualChecks: 위 네 조건 외에 신청 전에 꼭 확인해야 할 제한(재당첨 제한, 소득·자산 기준, 거주기간, 나이, 해외 체류, 중복 청약 제한 등)을
+- manualChecks: 위 조건 외에 신청 전에 꼭 확인해야 할 제한(재당첨 제한, 소득·자산 기준, 거주기간, 나이, 해외 체류, 중복 청약 제한 등)을
   공고문에 있는 것만 1~5개, 각각 한 문장으로. page는 근거가 있는 쪽.
 - summary: 이 공고의 신청 자격을 사용자에게 한두 문장으로 설명. 확정할 수 없는 부분은 그렇다고 쓰세요."""
 
 
-def _check_schema(kinds, with_values=False, with_amount=False):
+def _check_schema(kinds, with_values=False, with_amount=False, with_age=False):
     props = {'kind': {'type': 'string', 'enum': kinds}, 'page': {'type': 'integer'}, 'quote': {'type': 'string'}}
+    if with_age:
+        props['minAge'] = {'type': 'integer'}
+        props['maxAge'] = {'type': 'integer'}
     if with_values:
         props['values'] = {'type': 'array', 'items': {'type': 'string', 'enum': REGION_LIST}}
     if with_amount:
@@ -82,11 +91,13 @@ SCHEMA = {
             'type': 'object',
             'properties': {
                 'housing': _check_schema(['none', 'max_one', 'not_required', 'unknown']),
-                'residence': _check_schema(['regions', 'unknown'], with_values=True),
+                'residence': _check_schema(['regions', 'not_required', 'unknown'], with_values=True),
                 'deposit': _check_schema(['minimum', 'not_required', 'standard_table', 'unknown'], with_amount=True),
                 'householder': _check_schema(['required', 'not_required', 'unknown']),
+                'age': _check_schema(['range', 'not_required', 'unknown'], with_age=True),
+                'marriage': _check_schema(['married', 'single', 'not_required', 'unknown']),
             },
-            'required': ['housing', 'residence', 'deposit', 'householder'],
+            'required': ['housing', 'residence', 'deposit', 'householder', 'age', 'marriage'],
             'additionalProperties': False,
         },
         'manualChecks': {
@@ -259,7 +270,7 @@ def verify(raw, pages):
 
     checks = {}
     for key, check in (raw.get('checks') or {}).items():
-        if not isinstance(check, dict) or check.get('kind') in (None, 'unknown'):
+        if key not in KINDS or not isinstance(check, dict) or check.get('kind') not in KINDS[key]:
             continue
         if not is_sentence(check.get('quote')):
             continue
@@ -267,7 +278,7 @@ def verify(raw, pages):
         if not page:
             continue
         entry = {'kind': check['kind'], 'page': page, 'quote': check['quote'].strip()}
-        if key == 'residence':
+        if key == 'residence' and check['kind'] == 'regions':
             values = [v for v in check.get('values') or [] if v in REGIONS]
             if not values:
                 continue
@@ -277,6 +288,12 @@ def verify(raw, pages):
             if type(amount) is not int or amount <= 0:
                 continue
             entry['amountWon'] = amount
+        if check['kind'] == 'range':
+            low, high = check.get('minAge'), check.get('maxAge')
+            if (type(low) is not int or type(high) is not int or not 0 <= low <= 100 or not 0 <= high <= 120
+                    or (low == 0 and high == 0) or (high and high < low)):
+                continue
+            entry['minAge'], entry['maxAge'] = low, high
         checks[key] = entry
     manual = []
     for item in raw.get('manualChecks') or []:
@@ -337,6 +354,10 @@ def run(listings, cache, fetcher, client, now, max_new=MAX_NEW_PER_RUN, log=prin
             usable = (cached and cached['sha256'] == digest and cached.get('promptVersion') == PROMPT_VERSION
                       and cached.get('announceDate') == listing.get('announceDate')
                       and date.fromisoformat(cached['analyzedAt'][:10]) >= today - timedelta(days=31))
+            same_notice = (cached and cached['sha256'] == digest and cached.get('announceDate') == listing.get('announceDate')
+                           and date.fromisoformat(cached['analyzedAt'][:10]) >= today - timedelta(days=31))
+            if not usable and (client is None or analyzed >= max_new) and same_notice:
+                usable = True  # 지침만 바뀐 경우 다시 분석할 차례가 올 때까지 이전 분석을 계속 보여 준다.
             if not usable:
                 if client is None or analyzed >= max_new:
                     counts['autoSkipped'] += 1

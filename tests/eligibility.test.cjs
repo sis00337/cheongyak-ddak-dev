@@ -121,3 +121,24 @@ test('auto-analysed listing uses its evidence and computes the standard deposit'
   assert.equal(short.ok, false);
   assert.match(short.fails[0].text, /1,000,000원 부족/);
 });
+test('rental notice without residence limit, with age and marriage rules', () => {
+  const rental = { housing: rule('none'), residence: rule('not_required'), deposit: rule('not_required'),
+    householder: rule('not_required'), age: rule('range', { minAge: 19, maxAge: 39 }), marriage: rule('single') };
+  const base = { housing: '무주택' };
+  let result = evaluate(listing(rental), base, {}, now);
+  assert.equal(result.checks.length, 6);
+  assert.equal(result.checks[1].status, 'not_applicable');
+  assert.equal(result.unknown, true);
+  assert.ok(result.checks.find(r => r.key === 'age').needsInput);
+  result = evaluate(listing(rental), { ...base, age: 30, marriage: '미혼' }, {}, now);
+  assert.equal(result.ok, true);
+  result = evaluate(listing(rental), { ...base, age: 40, marriage: '기혼' }, {}, now);
+  assert.equal(result.fails.length, 2);
+  assert.match(result.fails[0].text, /만 19~39세/);
+});
+test('age and marriage rows only appear when the notice defines them', () => {
+  assert.equal(evaluate(listing(checks), profile, {}, now).checks.length, 4);
+  const adult = evaluate(listing({ ...checks, age: rule('range', { minAge: 19, maxAge: 0 }) }), { ...profile, age: 18 }, {}, now);
+  assert.equal(adult.checks[4].status, 'fail');
+  assert.match(adult.checks[4].text, /만 19세 이상/);
+});
